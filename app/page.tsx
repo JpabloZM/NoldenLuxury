@@ -37,7 +37,7 @@ export default function Home() {
                 key={material.name}
                 className="rounded-2xl border border-white/10 bg-slate-950 p-6"
               >
-                <p className="text-sm text-amber-200">Calidad ARNOLUX</p>
+                <p className="text-sm text-amber-200">Calidad Nolden Luxury</p>
                 <h3 className="mt-2 text-lg font-semibold text-white">
                   {material.name}
                 </h3>
@@ -86,7 +86,7 @@ export default function Home() {
               precios mayoristas o por unidad.
             </p>
             <p className="mt-4 text-sm font-medium tracking-wide text-amber-200">
-              ARNOLUX · El brillo de un legado
+              Nolden Luxury · El brillo de un legado
             </p>
           </div>
           <form className="space-y-4 rounded-2xl border border-white/10 bg-slate-950 p-6">

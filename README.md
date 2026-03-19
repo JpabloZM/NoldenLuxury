@@ -1,6 +1,6 @@
-## ARNOLUX Web MVP
+## Nolden Luxury Web MVP
 
-Sitio inicial corporativo para ARNOLUX (joyería), construido con Next.js (App Router), con foco en:
+Sitio inicial corporativo para Nolden Luxury (joyería), construido con Next.js (App Router), con foco en:
 
 - Presentación de propuesta de valor de la marca
 - Colecciones y materiales principales (oro laminado 18K y plata 925)

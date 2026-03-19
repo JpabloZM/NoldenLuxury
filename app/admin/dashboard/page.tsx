@@ -27,7 +27,7 @@ export default function AdminDashboard() {
       <div>
         <h1 className="text-4xl font-bold text-white mb-2">Dashboard</h1>
         <p className="text-slate-400">
-          Bienvenido al panel de administración ARNOLUX
+          Bienvenido al panel de administración Nolden Luxury
         </p>
 
         <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-4">

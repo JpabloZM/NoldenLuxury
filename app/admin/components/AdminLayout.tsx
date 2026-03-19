@@ -41,7 +41,7 @@ export default function AdminLayout({
       {/* Sidebar */}
       <aside className="w-64 border-r border-white/10 bg-slate-900">
         <div className="p-6">
-          <h1 className="text-2xl font-bold text-amber-300">ARNOLUX</h1>
+          <h1 className="text-2xl font-bold text-amber-300">Nolden Luxury</h1>
           <p className="mt-1 text-xs text-slate-400">Panel Admin</p>
         </div>
 

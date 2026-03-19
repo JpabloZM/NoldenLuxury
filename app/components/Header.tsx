@@ -54,8 +54,8 @@ export default function Header() {
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-3">
         <div className="h-16 w-16 relative rounded-full overflow-hidden border-2 border-amber-300">
           <Image
-            src="/logo.1 arnolux.jpeg"
-            alt="ARNOLUX Logo"
+            src="/logo1 nolden.jpeg"
+            alt="Nolden Luxury Logo"
             fill
             className="object-cover"
             priority

@@ -13,9 +13,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ARNOLUX | Joyería en Oro Laminado 18K y Plata 925",
+  title: "Nolden Luxury | Joyería en Oro Laminado 18K y Plata 925",
   description:
-    "Joyería ARNOLUX: piezas en oro laminado 18 kilates y plata 925 con estilo, calidad y garantía.",
+    "Nolden Luxury: piezas en oro laminado 18 kilates y plata 925 con estilo, calidad y garantía.",
+  icons: {
+    icon: "/logo1 nolden.jpeg",
+  },
 };
 
 export default function RootLayout({

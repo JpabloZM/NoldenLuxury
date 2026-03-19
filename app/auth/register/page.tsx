@@ -92,7 +92,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-md">
         <div className="rounded-2xl border border-white/10 bg-slate-900/80 p-8 backdrop-blur">
           <div className="mb-8 text-center">
-            <h1 className="text-3xl font-bold text-white">ARNOLUX</h1>
+            <h1 className="text-3xl font-bold text-white">Nolden Luxury</h1>
             <p className="mt-2 text-sm text-amber-200">Crea tu cuenta</p>
           </div>
 

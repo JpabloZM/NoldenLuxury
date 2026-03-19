@@ -9,8 +9,8 @@ export default function Footer() {
           <div>
             <div className="h-24 w-24 relative rounded-full overflow-hidden border-2 border-amber-300">
               <Image
-                src="/logo.1 arnolux.jpeg"
-                alt="ARNOLUX Logo"
+                src="/logo1 nolden.jpeg"
+                alt="Nolden Luxury Logo"
                 fill
                 className="object-cover"
               />
