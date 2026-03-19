@@ -1,4 +1,10 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## ARNOLUX Web MVP
+
+Sitio inicial corporativo para ARNOLUX (joyería), construido con Next.js (App Router), con foco en:
+
+- Presentación de propuesta de valor de la marca
+- Colecciones y materiales principales (oro laminado 18K y plata 925)
+- Beneficios de compra y bloque de contacto para pedidos/catálogo
 
 ## Getting Started
 
@@ -16,21 +22,28 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Estructura actual
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `app/page.tsx`: landing principal orientada a joyería con hero, colecciones, materiales y contacto.
+- `app/layout.tsx`: layout global y metadata del sitio.
+- `app/globals.css`: estilos base y variables de tema.
 
-## Learn More
+### Próximos pasos sugeridos
 
-To learn more about Next.js, take a look at the following resources:
+- Integrar formulario con backend/email/WhatsApp (API Route).
+- Agregar catálogo real de productos con imágenes, precio y stock.
+- Crear páginas internas (`/catalogo`, `/mayoreo`, `/cuidado-de-joyas`, `/contacto`).
+- Añadir SEO avanzado (Open Graph, schema.org y sitemap).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Scripts
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `npm run dev` → desarrollo.
+- `npm run lint` → validación ESLint.
+- `npm run build` → build de producción.
 
-## Deploy on Vercel
+## Stack
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Next.js 16
+- React 19
+- TypeScript
+- Tailwind CSS v4

@@ -1,0 +1,363 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import AdminLayout from "../components/AdminLayout";
+import type { ProductWithInventory } from "@/app/lib/admin-types";
+import {
+  fetchProducts,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+} from "@/app/lib/product-operations";
+
+export default function ProductosPage() {
+  const router = useRouter();
+  const [products, setProducts] = useState<ProductWithInventory[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string>("");
+  const [formData, setFormData] = useState({
+    name: "",
+    category: "Anillos" as const,
+    material: "Oro Laminado 18K" as const,
+    price: 0,
+    image: "",
+    inventory: 0,
+  });
+
+  useEffect(() => {
+    const token = localStorage.getItem("adminToken");
+    if (!token) {
+      router.replace("/admin/login");
+      return;
+    }
+    loadProducts();
+  }, [router]);
+
+  const loadProducts = async () => {
+    setLoading(true);
+    const data = await fetchProducts();
+    setProducts(data);
+    setLoading(false);
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Preview
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setImagePreview(event.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    // Upload
+    setUploading(true);
+    try {
+      const uploadForm = new FormData();
+      uploadForm.append("file", file);
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: uploadForm,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Upload failed");
+      }
+
+      const data = await response.json();
+      setFormData((prev) => ({ ...prev, image: data.url }));
+    } catch (err: any) {
+      console.error("Upload error:", err);
+      alert(`Error al subir: ${err.message}`);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+
+    if (editingId) {
+      const updated = await updateProduct(editingId, formData);
+      if (updated) {
+        setProducts(products.map((p) => (p.id === editingId ? updated : p)));
+      }
+      setEditingId(null);
+    } else {
+      const newProduct = await createProduct(formData);
+      if (newProduct) {
+        setProducts([newProduct, ...products]);
+      }
+    }
+
+    setFormData({
+      name: "",
+      category: "Anillos",
+      material: "Oro Laminado 18K",
+      price: 0,
+      image: "",
+      inventory: 0,
+    });
+    setImagePreview("");
+    setShowForm(false);
+    setSaving(false);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (confirm("¿Eliminar este producto?")) {
+      const success = await deleteProduct(id);
+      if (success) {
+        setProducts(products.filter((p) => p.id !== id));
+      }
+    }
+  };
+
+  const handleEdit = (product: ProductWithInventory) => {
+    setFormData({
+      name: product.name,
+      category: product.category as typeof formData.category,
+      material: product.material as typeof formData.material,
+      price: Number(product.price) || 0,
+      image: product.image,
+      inventory: Number(product.inventory) || 0,
+    });
+    setImagePreview(product.image);
+    setEditingId(product.id);
+    setShowForm(true);
+  };
+
+  return (
+    <AdminLayout>
+      <div>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-4xl font-bold text-white">
+              Gestión de Productos
+            </h1>
+            <p className="text-slate-400 mt-1">
+              Total: {products.length} productos {loading && "• Cargando..."}
+            </p>
+          </div>
+          <button
+            onClick={() => {
+              setShowForm(!showForm);
+              setEditingId(null);
+              setImagePreview("");
+              setFormData({
+                name: "",
+                category: "Anillos",
+                material: "Oro Laminado 18K",
+                price: 0,
+                image: "",
+                inventory: 0,
+              });
+            }}
+            className="px-6 py-3 bg-amber-300 text-slate-900 font-semibold rounded-lg hover:bg-amber-200 transition disabled:opacity-50"
+            disabled={saving}
+          >
+            {showForm ? "Cancelar" : "+ Agregar Producto"}
+          </button>
+        </div>
+
+        {showForm && (
+          <div className="mb-8 rounded-xl border border-white/10 bg-slate-900/50 p-6">
+            <h2 className="text-xl font-semibold text-white mb-4">
+              {editingId ? "Editar Producto" : "Nuevo Producto"}
+            </h2>
+            <form onSubmit={handleSubmit} className="grid gap-4 md:grid-cols-2">
+              <input
+                type="text"
+                placeholder="Nombre del producto"
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                required
+                disabled={saving}
+                className="rounded-lg border border-white/10 bg-slate-800 px-4 py-2 text-white placeholder:text-slate-500 focus:border-amber-300 outline-none disabled:opacity-50"
+              />
+              <select
+                value={formData.category}
+                onChange={(e) =>
+                  setFormData({ ...formData, category: e.target.value as any })
+                }
+                disabled={saving}
+                className="rounded-lg border border-white/10 bg-slate-800 px-4 py-2 text-white focus:border-amber-300 outline-none disabled:opacity-50"
+              >
+                <option>Anillos</option>
+                <option>Collares</option>
+                <option>Arete</option>
+                <option>Pulseras</option>
+                <option>Tobilleras</option>
+                <option>Dijes</option>
+              </select>
+              <select
+                value={formData.material}
+                onChange={(e) =>
+                  setFormData({ ...formData, material: e.target.value as any })
+                }
+                disabled={saving}
+                className="rounded-lg border border-white/10 bg-slate-800 px-4 py-2 text-white focus:border-amber-300 outline-none disabled:opacity-50"
+              >
+                <option>Oro Laminado 18K</option>
+                <option>Plata 925</option>
+              </select>
+              <input
+                type="number"
+                placeholder="Precio"
+                value={formData.price || ""}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    price: e.target.value ? parseFloat(e.target.value) : 0,
+                  })
+                }
+                required
+                disabled={saving}
+                className="rounded-lg border border-white/10 bg-slate-800 px-4 py-2 text-white placeholder:text-slate-500 focus:border-amber-300 outline-none disabled:opacity-50"
+              />
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                disabled={uploading || saving}
+                className="rounded-lg border border-white/10 bg-slate-800 px-4 py-2 text-white focus:border-amber-300 outline-none disabled:opacity-50"
+              />
+              {uploading && (
+                <p className="col-span-full text-sm text-amber-300">
+                  Subiendo imagen...
+                </p>
+              )}
+              {imagePreview && (
+                <div className="col-span-full">
+                  <p className="text-sm text-slate-400 mb-2">Vista previa:</p>
+                  <img
+                    src={imagePreview}
+                    alt="preview"
+                    className="max-h-32 rounded-lg border border-white/10"
+                  />
+                </div>
+              )}
+              <input
+                type="number"
+                placeholder="Inventario"
+                value={formData.inventory || ""}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    inventory: e.target.value ? parseInt(e.target.value) : 0,
+                  })
+                }
+                required
+                disabled={saving}
+                className="rounded-lg border border-white/10 bg-slate-800 px-4 py-2 text-white placeholder:text-slate-500 focus:border-amber-300 outline-none disabled:opacity-50"
+              />
+              <button
+                type="submit"
+                disabled={saving}
+                className="col-span-full bg-green-600 px-4 py-2 text-white font-semibold rounded-lg hover:bg-green-700 transition disabled:opacity-50"
+              >
+                {saving ? "Guardando..." : editingId ? "Actualizar" : "Crear"}{" "}
+                Producto
+              </button>
+            </form>
+          </div>
+        )}
+
+        {loading ? (
+          <div className="text-center py-12">
+            <p className="text-slate-400">Cargando productos...</p>
+          </div>
+        ) : products.length === 0 ? (
+          <div className="rounded-xl border border-white/10 p-12 text-center">
+            <p className="text-slate-400 mb-4">No hay productos creados</p>
+            <button
+              onClick={() => setShowForm(true)}
+              className="text-amber-300 hover:text-amber-200 font-semibold"
+            >
+              Crea el primero →
+            </button>
+          </div>
+        ) : (
+          <div className="rounded-xl border border-white/10 overflow-hidden">
+            <table className="w-full">
+              <thead className="bg-slate-900/70 border-b border-white/10">
+                <tr>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-slate-300">
+                    Nombre
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-slate-300">
+                    Categoría
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-slate-300">
+                    Material
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-slate-300">
+                    Precio
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-slate-300">
+                    Inventario
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-slate-300">
+                    Acciones
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {products.map((product) => (
+                  <tr
+                    key={product.id}
+                    className="border-b border-white/10 hover:bg-slate-900/30"
+                  >
+                    <td className="px-6 py-4 text-white">{product.name}</td>
+                    <td className="px-6 py-4 text-slate-400">
+                      {product.category}
+                    </td>
+                    <td className="px-6 py-4 text-slate-400">
+                      {product.material}
+                    </td>
+                    <td className="px-6 py-4 text-white font-semibold">
+                      ${product.price}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-semibold ${product.inventory < 5 ? "bg-red-500/20 text-red-300" : "bg-green-500/20 text-green-300"}`}
+                      >
+                        {product.inventory} unidades
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 space-x-2">
+                      <button
+                        onClick={() => handleEdit(product)}
+                        disabled={saving}
+                        className="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition disabled:opacity-50"
+                      >
+                        Editar
+                      </button>
+                      <button
+                        onClick={() => handleDelete(product.id)}
+                        disabled={saving}
+                        className="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition disabled:opacity-50"
+                      >
+                        Eliminar
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </AdminLayout>
+  );
+}
