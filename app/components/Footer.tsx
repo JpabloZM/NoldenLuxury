@@ -86,7 +86,7 @@ export default function Footer() {
         </div>
         <div className="mt-12 border-t border-white/10 pt-8 text-center text-xs text-slate-500">
           <p>
-            &copy; {new Date().getFullYear()} ARNOLUX. Todos los derechos
+            &copy; {new Date().getFullYear()} Nolden Luxury. Todos los derechos
             reservados.
           </p>
         </div>

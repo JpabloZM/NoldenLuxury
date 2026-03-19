@@ -27,13 +27,7 @@ export default function RegisterPage() {
     setError("");
 
     // Validaciones
-    if (
-      !formData.nombre ||
-      !formData.email ||
-      !formData.password ||
-      !formData.ciudad ||
-      !formData.direccionEntrega
-    ) {
+    if (!formData.nombre || !formData.email || !formData.password || !formData.ciudad || !formData.direccionEntrega) {
       setError("Por favor completa todos los campos requeridos");
       return;
     }
@@ -79,7 +73,7 @@ export default function RegisterPage() {
       localStorage.setItem("clienteToken", nuevoCliente.id);
       localStorage.setItem("clienteEmail", nuevoCliente.email);
 
-      router.push("/");
+      router.push("/cliente/dashboard");
     } catch (err) {
       setError("Error al registrarse. Intenta nuevamente.");
     } finally {
@@ -92,7 +86,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-md">
         <div className="rounded-2xl border border-white/10 bg-slate-900/80 p-8 backdrop-blur">
           <div className="mb-8 text-center">
-            <h1 className="text-3xl font-bold text-white">Nolden Luxury</h1>
+            <h1 className="text-3xl font-bold text-white">ARNOLUX</h1>
             <p className="mt-2 text-sm text-amber-200">Crea tu cuenta</p>
           </div>
 
@@ -209,18 +203,12 @@ export default function RegisterPage() {
 
           <p className="mt-6 text-center text-sm text-slate-400">
             ¿Ya tienes cuenta?{" "}
-            <Link
-              href="/auth/login"
-              className="text-amber-300 hover:text-amber-200"
-            >
+            <Link href="/auth/login" className="text-amber-300 hover:text-amber-200">
               Inicia sesión aquí
             </Link>
           </p>
 
-          <Link
-            href="/"
-            className="mt-4 block text-center text-xs text-slate-500 hover:text-slate-400"
-          >
+          <Link href="/" className="mt-4 block text-center text-xs text-slate-500 hover:text-slate-400">
             Volver a inicio
           </Link>
         </div>

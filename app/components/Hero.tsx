@@ -15,7 +15,7 @@ export default function Hero() {
         </p>
         <p className="max-w-xl text-slate-300">
           Descubre piezas elegantes y duraderas en oro laminado 18 kilates y
-          plata 925. En ARNOLUX seleccionamos diseños modernos para elevar tus
+          plata 925. En Nolden Luxury seleccionamos diseños modernos para elevar tus
           looks diarios y ocasiones especiales.
         </p>
         <div className="flex flex-wrap gap-3">

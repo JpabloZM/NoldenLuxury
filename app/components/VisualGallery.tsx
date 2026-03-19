@@ -73,7 +73,7 @@ export default function VisualGallery() {
       <div className="absolute inset-0 flex items-end justify-start p-8">
         <div>
           <p className="text-sm font-semibold uppercase tracking-wider text-amber-200">
-            Colección ARNOLUX
+            Colección Nolden Luxury
           </p>
           <p className="mt-2 text-2xl font-bold text-white">
             El brillo de un legado

@@ -16,9 +16,6 @@ export const metadata: Metadata = {
   title: "Nolden Luxury | Joyería en Oro Laminado 18K y Plata 925",
   description:
     "Nolden Luxury: piezas en oro laminado 18 kilates y plata 925 con estilo, calidad y garantía.",
-  icons: {
-    icon: "/logo1 nolden.jpeg",
-  },
 };
 
 export default function RootLayout({
