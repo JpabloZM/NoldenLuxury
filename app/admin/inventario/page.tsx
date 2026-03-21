@@ -256,7 +256,7 @@ export default function InventoryPage() {
               {/* Item Name - Combobox with search */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Item * (Escribe para buscar)
+                  Item * <span className="text-slate-400 font-normal">(Escribe para buscar)</span>
                 </label>
                 <div className="relative">
                   <input
@@ -293,8 +293,8 @@ export default function InventoryPage() {
                         });
                       }
                     }}
-                    placeholder="Escribe el nombre del item..."
-                    className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500"
+                    placeholder="Selecciona o escribe el nombre..."
+                    className="w-full bg-slate-700 border-2 border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 focus:bg-slate-700/60 transition-all duration-200"
                   />
                   <datalist id="items-list">
                     {items
