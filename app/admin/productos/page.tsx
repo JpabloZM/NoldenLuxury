@@ -310,9 +310,7 @@ export default function ProductosPage() {
                     onChange={(e) =>
                       setFormData({
                         ...formData,
-                        inventory: e.target.value
-                          ? parseInt(e.target.value)
-                          : 0,
+                        inventory: e.target.value === "" ? 0 : parseInt(e.target.value, 10) || 0,
                       })
                     }
                     required

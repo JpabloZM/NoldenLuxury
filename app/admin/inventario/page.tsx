@@ -316,11 +316,11 @@ export default function InventoryPage() {
                 </label>
                 <input
                   type="number"
-                  value={formData.quantity_before}
+                  value={formData.quantity_before === 0 && !formData.item_id ? "" : formData.quantity_before}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      quantity_before: parseInt(e.target.value),
+                      quantity_before: e.target.value === "" ? 0 : parseInt(e.target.value, 10) || 0,
                     })
                   }
                   className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white"
@@ -339,7 +339,7 @@ export default function InventoryPage() {
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      quantity_changed: parseInt(e.target.value),
+                      quantity_changed: e.target.value === "" ? 0 : parseInt(e.target.value, 10) || 0,
                     })
                   }
                   className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white"

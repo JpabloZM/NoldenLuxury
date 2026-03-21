@@ -441,11 +441,11 @@ export default function PedidosPage() {
 
                       <input
                         type="number"
-                        value={newItemData.quantity}
+                        value={newItemData.quantity || ""}
                         onChange={(e) =>
                           setNewItemData({
                             ...newItemData,
-                            quantity: parseInt(e.target.value) || 1,
+                            quantity: e.target.value === "" ? 0 : parseInt(e.target.value, 10) || 1,
                           })
                         }
                         className="bg-slate-600 border border-slate-500 rounded px-2 py-1 text-white text-sm"
@@ -455,11 +455,11 @@ export default function PedidosPage() {
 
                       <input
                         type="number"
-                        value={newItemData.unit_price}
+                        value={newItemData.unit_price || ""}
                         onChange={(e) =>
                           setNewItemData({
                             ...newItemData,
-                            unit_price: parseFloat(e.target.value) || 0,
+                            unit_price: e.target.value === "" ? 0 : parseFloat(e.target.value) || 0,
                           })
                         }
                         className="bg-slate-600 border border-slate-500 rounded px-2 py-1 text-white text-sm"
