@@ -89,6 +89,9 @@ export default function MaterialesPage() {
         resetForm();
         setShowForm(false);
         setTimeout(() => setSuccessMessage(""), 3000);
+      } else {
+        setError("Error actualizando el material. Revisa la consola.");
+        setTimeout(() => setError(null), 5000);
       }
     } else {
       // Crear
@@ -99,6 +102,9 @@ export default function MaterialesPage() {
         resetForm();
         setShowForm(false);
         setTimeout(() => setSuccessMessage(""), 3000);
+      } else {
+        setError("Error creando el material. Revisa la consola.");
+        setTimeout(() => setError(null), 5000);
       }
     }
   };

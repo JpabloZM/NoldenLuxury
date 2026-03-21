@@ -76,14 +76,20 @@ export async function updateMaterial(
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      console.error("Error updating material:", error);
+      let errorMessage = "Unknown error";
+      try {
+        const error = await response.json();
+        errorMessage = error.error || JSON.stringify(error);
+      } catch {
+        errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+      }
+      console.error("Error updating material:", errorMessage);
       return null;
     }
 
     return await response.json();
   } catch (err) {
-    console.error("Error in updateMaterial:", err);
+    console.error("Error in updateMaterial:", err instanceof Error ? err.message : String(err));
     return null;
   }
 }

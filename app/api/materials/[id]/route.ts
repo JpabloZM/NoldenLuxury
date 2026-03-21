@@ -45,34 +45,61 @@ export async function PUT(
   try {
     const { id } = params;
     const body = await request.json();
+    console.log("PUT /api/materials/[id] - ID:", id, "Body:", body);
+
+    // Solo permitir actualizar estos campos
+    const allowedFields = [
+      "name",
+      "quantity",
+      "unit",
+      "min_quantity",
+      "cost_per_unit",
+      "supplier",
+    ];
+    const updateData: any = {};
+
+    for (const field of allowedFields) {
+      if (field in body) {
+        updateData[field] = body[field];
+      }
+    }
+
+    // Agregar timestamp de actualización
+    updateData.last_updated = new Date().toISOString();
+
+    console.log("Updating material with data:", updateData);
 
     const { data, error } = await supabase
       .from("materials")
-      .update({
-        ...body,
-        last_updated: new Date().toISOString(),
-      })
+      .update(updateData)
       .eq("id", id)
       .select()
       .single();
 
     if (error) {
       console.error("Supabase error:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json(
+        { error: `Database error: ${error.message}` },
+        { status: 500 },
+      );
     }
 
     if (!data) {
+      console.warn("Material not found for ID:", id);
       return NextResponse.json(
         { error: "Material not found" },
         { status: 404 },
       );
     }
 
+    console.log("Material updated successfully:", data);
     return NextResponse.json(data);
   } catch (err) {
-    console.error("Error updating material:", err);
+    const errorMessage =
+      err instanceof Error ? err.message : String(err);
+    console.error("Error updating material:", errorMessage);
     return NextResponse.json(
-      { error: "Failed to update material" },
+      { error: `Server error: ${errorMessage}` },
       { status: 500 },
     );
   }
