@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     // Contar productos
     const { data: productsData, error: productsError } = await supabase
       .from('products')
-      .select('id, quantity, min_quantity', { count: 'exact' });
+      .select('id, inventory', { count: 'exact' });
 
     if (productsError) {
       console.error('Error fetching products:', productsError);
@@ -42,9 +42,9 @@ export async function GET(request: NextRequest) {
       (m) => m.quantity < m.min_quantity
     ).length;
 
-    // Contar productos con bajo stock
+    // Contar productos con bajo stock (umbral de 5)
     const productsLowStock = (productsData || []).filter(
-      (p) => p.quantity < p.min_quantity
+      (p) => (p.inventory || 0) < 5
     ).length;
 
     // Obtener movimientos recientes

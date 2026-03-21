@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     // Obtener productos
     const { data: products, error: productsError } = await supabase
       .from('products')
-      .select('id, name, quantity, min_quantity, unit, price');
+      .select('id, name, inventory, price');
 
     if (productsError) {
       console.error('Error fetching products:', productsError);
@@ -53,11 +53,11 @@ export async function GET(request: NextRequest) {
         id: p.id,
         name: p.name,
         type: 'product' as const,
-        quantity: p.quantity,
-        min_quantity: p.min_quantity,
-        unit: p.unit,
+        quantity: p.inventory || 0,
+        min_quantity: 5, // Valor por defecto para productos
+        unit: 'Unidad',
         cost_per_unit: p.price,
-        status: (p.quantity < p.min_quantity ? 'bajo_stock' : 'normal') as const,
+        status: ((p.inventory || 0) < 5 ? 'bajo_stock' : 'normal') as const,
       })),
     ];
 
