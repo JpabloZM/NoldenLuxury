@@ -1,7 +1,7 @@
 // Tipos para el sistema de inventario completo
 
-export type MovementType = 'entrada' | 'salida' | 'ajuste' | 'produccion';
-export type ItemType = 'material' | 'product';
+export type MovementType = "entrada" | "salida" | "ajuste" | "produccion";
+export type ItemType = "material" | "product";
 
 export interface InventoryMovement {
   id: string;
@@ -48,5 +48,5 @@ export interface InventoryItem {
   min_quantity: number;
   unit?: string;
   cost_per_unit?: number;
-  status: 'normal' | 'bajo_stock';
+  status: "normal" | "bajo_stock";
 }
