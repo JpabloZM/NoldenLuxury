@@ -253,39 +253,60 @@ export default function InventoryPage() {
                 </select>
               </div>
 
-              {/* Item Name - Select dropdown */}
+              {/* Item Name - Combobox with search */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Item *
+                  Item * (Escribe para buscar)
                 </label>
-                <select
-                  value={formData.item_id}
-                  onChange={(e) => {
-                    const selectedItem = items.find(
-                      (item) =>
-                        item.id === e.target.value &&
-                        item.type === formData.item_type,
-                    );
-                    if (selectedItem) {
-                      setFormData({
-                        ...formData,
-                        item_id: selectedItem.id,
-                        item_name: selectedItem.name,
-                        quantity_before: selectedItem.quantity,
-                      });
-                    }
-                  }}
-                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white"
-                >
-                  <option value="">Selecciona un item...</option>
-                  {items
-                    .filter((item) => item.type === formData.item_type)
-                    .map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.name} (Stock: {item.quantity})
-                      </option>
-                    ))}
-                </select>
+                <div className="relative">
+                  <input
+                    type="text"
+                    list="items-list"
+                    value={formData.item_name}
+                    onChange={(e) => {
+                      setFormData({ ...formData, item_name: e.target.value });
+                      // Limpiar ID si el nombre no coincide con ninguno
+                      const foundItem = items.find(
+                        (item) =>
+                          item.name === e.target.value &&
+                          item.type === formData.item_type,
+                      );
+                      if (!foundItem) {
+                        setFormData((prev) => ({
+                          ...prev,
+                          item_id: "",
+                          quantity_before: 0,
+                        }));
+                      }
+                    }}
+                    onBlur={() => {
+                      const foundItem = items.find(
+                        (item) =>
+                          item.name === formData.item_name &&
+                          item.type === formData.item_type,
+                      );
+                      if (foundItem) {
+                        setFormData({
+                          ...formData,
+                          item_id: foundItem.id,
+                          quantity_before: foundItem.quantity,
+                        });
+                      }
+                    }}
+                    placeholder="Escribe el nombre del item..."
+                    className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500"
+                  />
+                  <datalist id="items-list">
+                    {items
+                      .filter((item) => item.type === formData.item_type)
+                      .map((item) => (
+                        <option
+                          key={item.id}
+                          value={item.name}
+                        >{`${item.name} (Stock: ${item.quantity})`}</option>
+                      ))}
+                  </datalist>
+                </div>
               </div>
 
               {/* Cantidad Anterior */}
