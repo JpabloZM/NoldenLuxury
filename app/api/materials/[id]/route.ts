@@ -4,10 +4,10 @@ import { NextRequest, NextResponse } from "next/server";
 // GET - Obtener material por ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const { data, error } = await supabase
       .from("materials")
@@ -40,14 +40,14 @@ export async function GET(
 // PUT - Actualizar material
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     console.log("PUT /api/materials/[id] - ID:", id);
 
-    // Validar que el ID sea válido (no undefined, no vacío)
-    if (!id || id === "undefined" || id.trim() === "") {
+    // Validar que el ID sea válido
+    if (!id) {
       console.error("Invalid material ID:", id);
       return NextResponse.json(
         { error: "Invalid material ID provided" },
@@ -119,10 +119,10 @@ export async function PUT(
 // DELETE - Eliminar material
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const { error } = await supabase.from("materials").delete().eq("id", id);
 

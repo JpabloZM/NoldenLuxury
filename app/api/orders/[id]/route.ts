@@ -14,10 +14,10 @@ try {
 // GET - Obtener orden con items y movimientos
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const orderId = params.id;
+    const { id: orderId } = await params;
 
     const { data: orderData, error: orderError } = await supabase
       .from("orders")
@@ -99,10 +99,10 @@ export async function GET(
 // PATCH - Actualizar estado de orden (con automatización)
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const orderId = params.id;
+    const { id: orderId } = await params;
     const body = await request.json();
     const { status, confirm = false } = body;
 

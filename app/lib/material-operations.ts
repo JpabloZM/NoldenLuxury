@@ -69,10 +69,10 @@ export async function updateMaterial(
   data: Partial<MaterialForm>,
 ): Promise<Material | null> {
   try {
-    console.log("updateMaterial called with id:", id, "data:", data);
+    console.log("updateMaterial called with id:", id, "type:", typeof id, "data:", data);
 
     // Validar que el ID no es undefined o vacío
-    if (!id || id.trim() === "" || id === "undefined") {
+    if (!id) {
       console.error("Invalid ID provided to updateMaterial:", id);
       return null;
     }

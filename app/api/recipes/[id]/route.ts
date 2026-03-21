@@ -14,10 +14,10 @@ try {
 // DELETE - Eliminar receta
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const recipeId = params.id;
+    const { id: recipeId } = await params;
 
     const { error } = await supabase
       .from("product_recipes")

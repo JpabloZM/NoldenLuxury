@@ -14,10 +14,10 @@ try {
 // PATCH - Actualizar item de orden
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { itemId: string } },
+  { params }: { params: Promise<{ itemId: string }> },
 ) {
   try {
-    const itemId = params.itemId;
+    const { itemId } = await params;
     const body = await request.json();
 
     const { data: currentItem, error: fetchError } = await supabase
@@ -81,10 +81,10 @@ export async function PATCH(
 // DELETE - Eliminar item de orden
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { itemId: string } },
+  { params }: { params: Promise<{ itemId: string }> },
 ) {
   try {
-    const itemId = params.itemId;
+    const { itemId } = await params;
 
     const { data: item, error: fetchError } = await supabase
       .from("order_items")

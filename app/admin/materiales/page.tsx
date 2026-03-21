@@ -80,17 +80,9 @@ export default function MaterialesPage() {
       return;
     }
 
-    console.log("handleSave called with editingId:", editingId);
+    console.log("handleSave called with editingId:", editingId, "type:", typeof editingId);
 
     if (editingId) {
-      // Validar que editingId es un UUID válido
-      if (!editingId || editingId.trim() === "") {
-        console.error("Invalid editingId:", editingId);
-        setError("Error: ID de material inválido. Intenta nuevamente.");
-        return;
-      }
-
-      // Actualizar
       console.log("Updating material:", editingId, formData);
       const result = await updateMaterial(editingId, formData);
       if (result) {
