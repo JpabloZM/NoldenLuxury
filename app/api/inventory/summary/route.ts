@@ -58,12 +58,12 @@ export async function GET(request: NextRequest) {
 
     // Contar materiales con bajo stock
     const materialsLowStock = (materialsData || []).filter(
-      (m) => m.quantity < m.min_quantity,
+      (m: any) => m.quantity < m.min_quantity,
     ).length;
 
     // Contar productos con bajo stock (umbral de 5)
     const productsLowStock = (productsData || []).filter(
-      (p) => (p.inventory || 0) < 5,
+      (p: any) => (p.inventory || 0) < 5,
     ).length;
 
     // Obtener movimientos recientes
