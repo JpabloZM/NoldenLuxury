@@ -16,6 +16,7 @@ interface MaterialUsed {
   material_id: string;
   material_name: string;
   quantity_used: number;
+  unit: string;
 }
 
 export default function ProductosPage() {
@@ -29,6 +30,7 @@ export default function ProductosPage() {
   const [uploading, setUploading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string>("");
   const [materialsUsed, setMaterialsUsed] = useState<MaterialUsed[]>([]);
+  const [selectedMaterialUnit, setSelectedMaterialUnit] = useState<string>("g");
 
   const [formData, setFormData] = useState({
     name: "",
@@ -373,7 +375,7 @@ export default function ProductosPage() {
                               {mat.material_name}
                             </p>
                             <p className="text-sm text-slate-400">
-                              {mat.quantity_used}g
+                              {mat.quantity_used} {mat.unit}
                             </p>
                           </div>
                           <button
@@ -396,25 +398,33 @@ export default function ProductosPage() {
                     <select
                       id="material-select"
                       defaultValue=""
+                      onChange={(e) => {
+                        const selectedMat = materials.find(
+                          (m) => m.id === e.target.value,
+                        );
+                        setSelectedMaterialUnit(selectedMat?.unit || "g");
+                      }}
                       className="rounded-lg border border-white/10 bg-slate-800 px-4 py-3 text-white focus:border-amber-300 outline-none"
                     >
                       <option value="">Selecciona material...</option>
                       {materials.map((mat) => (
                         <option key={mat.id} value={mat.id}>
-                          {mat.name}
+                          {mat.name} ({mat.unit})
                         </option>
                       ))}
                     </select>
 
-                    <input
-                      type="number"
-                      id="material-quantity"
-                      placeholder="Cantidad (g)"
-                      min="0.1"
-                      step="0.1"
-                      defaultValue=""
-                      className="rounded-lg border border-white/10 bg-slate-800 px-4 py-3 text-white placeholder:text-slate-500 focus:border-amber-300 outline-none"
-                    />
+                    <div>
+                      <input
+                        type="number"
+                        id="material-quantity"
+                        placeholder={`Cantidad (${selectedMaterialUnit})`}
+                        min="0.1"
+                        step="0.1"
+                        defaultValue=""
+                        className="rounded-lg border border-white/10 bg-slate-800 px-4 py-3 text-white placeholder:text-slate-500 focus:border-amber-300 outline-none w-full"
+                      />
+                    </div>
 
                     <button
                       type="button"
@@ -437,10 +447,12 @@ export default function ProductosPage() {
                                 material_id: select.value,
                                 material_name: selectedMaterial.name,
                                 quantity_used: parseFloat(quantity.value),
+                                unit: selectedMaterial.unit || "g",
                               },
                             ]);
                             select.value = "";
                             quantity.value = "";
+                            setSelectedMaterialUnit("g");
                           }
                         }
                       }}
