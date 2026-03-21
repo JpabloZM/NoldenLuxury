@@ -92,8 +92,9 @@ export async function POST(request: NextRequest) {
         .upsert({
           product_id,
           material_id,
-          quantity_needed: quantity_used / quantity_produced, // Cantidad por unidad
-          unit: "g",
+          quantity_per_unit: quantity_used / quantity_produced, // Cantidad por unidad producida
+          unit: material.unit || "g", // Usar la unidad del material
+          created_at: new Date().toISOString(),
         });
 
       if (recipeError) {
@@ -101,6 +102,8 @@ export async function POST(request: NextRequest) {
           `Error creating recipe for product ${product_id}:`,
           recipeError,
         );
+      } else {
+        console.log(`Recipe created for ${product_id}: ${quantity_used / quantity_produced}${material.unit || "g"} per unit`);
       }
     }
 

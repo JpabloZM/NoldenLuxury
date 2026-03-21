@@ -11,9 +11,17 @@ export async function fetchMovements(
 ): Promise<InventoryMovement[]> {
   try {
     console.log("Fetching inventory movements");
-    const response = await fetch(`/api/inventory/movements?limit=${limit}`, {
+    // Agregar timestamp para forzar actualización y evitar cache
+    const timestamp = new Date().getTime();
+    const response = await fetch(`/api/inventory/movements?limit=${limit}&t=${timestamp}`, {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+      },
+      cache: "no-store",
     });
 
     if (!response.ok) {
@@ -62,9 +70,17 @@ export async function createMovement(
 export async function fetchInventorySummary(): Promise<InventorySummary> {
   try {
     console.log("Fetching inventory summary");
-    const response = await fetch("/api/inventory/summary", {
+    // Agregar timestamp para forzar actualización y evitar cache
+    const timestamp = new Date().getTime();
+    const response = await fetch(`/api/inventory/summary?t=${timestamp}`, {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+      },
+      cache: "no-store",
     });
 
     if (!response.ok) {
@@ -84,9 +100,17 @@ export async function fetchInventorySummary(): Promise<InventorySummary> {
 export async function fetchInventoryItems(): Promise<InventoryItem[]> {
   try {
     console.log("Fetching inventory items");
-    const response = await fetch("/api/inventory/items", {
+    // Agregar timestamp para forzar actualización y evitar cache
+    const timestamp = new Date().getTime();
+    const response = await fetch(`/api/inventory/items?t=${timestamp}`, {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+      },
+      cache: "no-store",
     });
 
     if (!response.ok) {
