@@ -63,8 +63,15 @@ export default function ProductosPage() {
 
   const fetchMaterials = async () => {
     try {
-      const response = await fetch("/api/materials", {
+      // Agregar timestamp para forzar actualización y evitar cache
+      const timestamp = new Date().getTime();
+      const response = await fetch(`/api/materials?t=${timestamp}`, {
         cache: "no-store",
+        headers: {
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+        },
       });
       if (!response.ok) return [];
       const data = await response.json();

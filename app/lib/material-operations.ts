@@ -3,8 +3,15 @@ import type { Material, MaterialForm } from "./material-types";
 // Obtener todos los materiales
 export async function fetchMaterials(): Promise<Material[]> {
   try {
-    const response = await fetch("/api/materials", {
+    // Agregar timestamp para forzar actualización y evitar cache
+    const timestamp = new Date().getTime();
+    const response = await fetch(`/api/materials?t=${timestamp}`, {
       cache: "no-store",
+      headers: {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+      },
     });
 
     if (!response.ok) {
