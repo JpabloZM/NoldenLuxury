@@ -11,7 +11,13 @@ export async function GET(request: NextRequest) {
   try {
     console.log("GET /api/inventory/summary - Fetching inventory summary");
 
+    // Verificar config
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    console.log("Supabase config:", { url: !!url, key: !!key });
+
     // Obtener materiales (sin count)
+    console.log("Fetching materials...");
     const { data: materialsData, error: materialsError } = await supabase
       .from("materials")
       .select("id, quantity, min_quantity");
@@ -19,12 +25,14 @@ export async function GET(request: NextRequest) {
     if (materialsError) {
       console.error("Error fetching materials:", materialsError);
       return NextResponse.json(
-        { error: materialsError.message },
+        { error: `Materials error: ${materialsError.message}` },
         { status: 500 },
       );
     }
+    console.log("Materials fetched:", materialsData?.length);
 
     // Obtener productos (sin count)
+    console.log("Fetching products...");
     const { data: productsData, error: productsError } = await supabase
       .from("products")
       .select("id, inventory");
@@ -32,10 +40,11 @@ export async function GET(request: NextRequest) {
     if (productsError) {
       console.error("Error fetching products:", productsError);
       return NextResponse.json(
-        { error: productsError.message },
+        { error: `Products error: ${productsError.message}` },
         { status: 500 },
       );
     }
+    console.log("Products fetched:", productsData?.length);
 
     // Contar materiales con bajo stock
     const materialsLowStock = (materialsData || []).filter(
@@ -48,6 +57,7 @@ export async function GET(request: NextRequest) {
     ).length;
 
     // Obtener movimientos recientes
+    console.log("Fetching recent movements...");
     const { data: recentMovements, error: movementsError } = await supabase
       .from("inventory_movements")
       .select("*")
@@ -57,10 +67,11 @@ export async function GET(request: NextRequest) {
     if (movementsError) {
       console.error("Error fetching movements:", movementsError);
       return NextResponse.json(
-        { error: movementsError.message },
+        { error: `Movements error: ${movementsError.message}` },
         { status: 500 },
       );
     }
+    console.log("Movements fetched:", recentMovements?.length);
 
     const summary = {
       total_materials: materialsData?.length || 0,
@@ -76,7 +87,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Error in GET /api/inventory/summary:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: `Internal server error: ${error}` },
       { status: 500 },
     );
   }

@@ -11,7 +11,13 @@ export async function GET(request: NextRequest) {
   try {
     console.log("GET /api/inventory/items - Fetching consolidated items");
 
+    // Verificar config
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    console.log("Supabase config:", { url: !!url, key: !!key });
+
     // Obtener materiales
+    console.log("Fetching materials...");
     const { data: materials, error: materialsError } = await supabase
       .from("materials")
       .select("id, name, quantity, min_quantity, unit, cost_per_unit");
@@ -19,12 +25,14 @@ export async function GET(request: NextRequest) {
     if (materialsError) {
       console.error("Error fetching materials:", materialsError);
       return NextResponse.json(
-        { error: materialsError.message },
+        { error: `Materials error: ${materialsError.message}` },
         { status: 500 },
       );
     }
+    console.log("Materials fetched:", materials?.length);
 
     // Obtener productos
+    console.log("Fetching products...");
     const { data: products, error: productsError } = await supabase
       .from("products")
       .select("id, name, inventory, price");
@@ -32,10 +40,11 @@ export async function GET(request: NextRequest) {
     if (productsError) {
       console.error("Error fetching products:", productsError);
       return NextResponse.json(
-        { error: productsError.message },
+        { error: `Products error: ${productsError.message}` },
         { status: 500 },
       );
     }
+    console.log("Products fetched:", products?.length);
 
     // Consolidar items
     const items = [
