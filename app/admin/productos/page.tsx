@@ -161,113 +161,143 @@ export default function ProductosPage() {
                 inventory: 0,
               });
             }}
-            className="px-6 py-3 bg-amber-300 text-slate-900 font-semibold rounded-lg hover:bg-amber-200 transition disabled:opacity-50"
+            className="bg-amber-300 hover:bg-amber-400 text-slate-900 font-semibold px-6 py-2.5 rounded-lg transition disabled:opacity-50"
             disabled={saving}
           >
-            {showForm ? "Cancelar" : "+ Agregar Producto"}
+            {showForm ? "Cancelar" : "Nuevo Producto"}
           </button>
         </div>
 
         {showForm && (
           <div className="mb-8 rounded-xl border border-white/10 bg-slate-900/50 p-6">
-            <h2 className="text-xl font-semibold text-white mb-4">
+            <h2 className="text-xl font-semibold text-white mb-6">
               {editingId ? "Editar Producto" : "Nuevo Producto"}
             </h2>
-            <form onSubmit={handleSubmit} className="grid gap-4 md:grid-cols-2">
-              <input
-                type="text"
-                placeholder="Nombre del producto"
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-                required
-                disabled={saving}
-                className="rounded-lg border border-white/10 bg-slate-800 px-4 py-2 text-white placeholder:text-slate-500 focus:border-amber-300 outline-none disabled:opacity-50"
-              />
-              <select
-                value={formData.category}
-                onChange={(e) =>
-                  setFormData({ ...formData, category: e.target.value as any })
-                }
-                disabled={saving}
-                className="rounded-lg border border-white/10 bg-slate-800 px-4 py-2 text-white focus:border-amber-300 outline-none disabled:opacity-50"
-              >
-                <option>Anillos</option>
-                <option>Collares</option>
-                <option>Arete</option>
-                <option>Pulseras</option>
-                <option>Tobilleras</option>
-                <option>Dijes</option>
-              </select>
-              <select
-                value={formData.material}
-                onChange={(e) =>
-                  setFormData({ ...formData, material: e.target.value as any })
-                }
-                disabled={saving}
-                className="rounded-lg border border-white/10 bg-slate-800 px-4 py-2 text-white focus:border-amber-300 outline-none disabled:opacity-50"
-              >
-                <option>Oro Laminado 18K</option>
-                <option>Plata 925</option>
-              </select>
-              <input
-                type="number"
-                placeholder="Precio"
-                value={formData.price || ""}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    price: e.target.value ? parseFloat(e.target.value) : 0,
-                  })
-                }
-                required
-                disabled={saving}
-                className="rounded-lg border border-white/10 bg-slate-800 px-4 py-2 text-white placeholder:text-slate-500 focus:border-amber-300 outline-none disabled:opacity-50"
-              />
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                disabled={uploading || saving}
-                className="rounded-lg border border-white/10 bg-slate-800 px-4 py-2 text-white focus:border-amber-300 outline-none disabled:opacity-50"
-              />
-              {uploading && (
-                <p className="col-span-full text-sm text-amber-300">
-                  Subiendo imagen...
-                </p>
-              )}
-              {imagePreview && (
-                <div className="col-span-full">
-                  <p className="text-sm text-slate-400 mb-2">Vista previa:</p>
-                  <img
-                    src={imagePreview}
-                    alt="preview"
-                    className="max-h-32 rounded-lg border border-white/10"
+            <form onSubmit={handleSubmit} className="grid gap-6 md:grid-cols-2">
+              {/* Columna Izquierda - Campos */}
+              <div className="space-y-4">
+                <input
+                  type="text"
+                  placeholder="Nombre del producto"
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
+                  required
+                  disabled={saving}
+                  className="w-full rounded-lg border border-white/10 bg-slate-800 px-4 py-3 text-white placeholder:text-slate-500 focus:border-amber-300 outline-none disabled:opacity-50"
+                />
+                <select
+                  value={formData.category}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      category: e.target.value as any,
+                    })
+                  }
+                  disabled={saving}
+                  className="w-full rounded-lg border border-white/10 bg-slate-800 px-4 py-3 text-white focus:border-amber-300 outline-none disabled:opacity-50"
+                >
+                  <option>Anillos</option>
+                  <option>Collares</option>
+                  <option>Arete</option>
+                  <option>Pulseras</option>
+                  <option>Tobilleras</option>
+                  <option>Dijes</option>
+                </select>
+                <select
+                  value={formData.material}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      material: e.target.value as any,
+                    })
+                  }
+                  disabled={saving}
+                  className="w-full rounded-lg border border-white/10 bg-slate-800 px-4 py-3 text-white focus:border-amber-300 outline-none disabled:opacity-50"
+                >
+                  <option>Oro Laminado 18K</option>
+                  <option>Plata 925</option>
+                </select>
+                <div className="grid grid-cols-2 gap-4">
+                  <input
+                    type="number"
+                    placeholder="Precio"
+                    value={formData.price || ""}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        price: e.target.value ? parseFloat(e.target.value) : 0,
+                      })
+                    }
+                    required
+                    disabled={saving}
+                    className="rounded-lg border border-white/10 bg-slate-800 px-4 py-3 text-white placeholder:text-slate-500 focus:border-amber-300 outline-none disabled:opacity-50"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Cantidad"
+                    value={formData.inventory || ""}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        inventory: e.target.value
+                          ? parseInt(e.target.value)
+                          : 0,
+                      })
+                    }
+                    required
+                    disabled={saving}
+                    className="rounded-lg border border-white/10 bg-slate-800 px-4 py-3 text-white placeholder:text-slate-500 focus:border-amber-300 outline-none disabled:opacity-50"
                   />
                 </div>
-              )}
-              <input
-                type="number"
-                placeholder="Inventario"
-                value={formData.inventory || ""}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    inventory: e.target.value ? parseInt(e.target.value) : 0,
-                  })
-                }
-                required
-                disabled={saving}
-                className="rounded-lg border border-white/10 bg-slate-800 px-4 py-2 text-white placeholder:text-slate-500 focus:border-amber-300 outline-none disabled:opacity-50"
-              />
+              </div>
+
+              {/* Columna Derecha - Imagen */}
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    Imagen del Producto
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    disabled={uploading || saving}
+                    className="w-full rounded-lg border border-white/10 bg-slate-800 px-4 py-3 text-white focus:border-amber-300 outline-none disabled:opacity-50 cursor-pointer"
+                  />
+                  {uploading && (
+                    <p className="text-sm text-amber-300 mt-2">
+                      ⏳ Subiendo imagen...
+                    </p>
+                  )}
+                </div>
+                {imagePreview && (
+                  <div className="flex flex-col items-center">
+                    <p className="text-sm font-medium text-slate-300 mb-3">
+                      Vista previa:
+                    </p>
+                    <img
+                      src={imagePreview}
+                      alt="preview"
+                      style={{ height: "100px" }}
+                      className="object-contain rounded-lg border border-white/10 bg-slate-800 p-2"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Botón - Ancho completo */}
               <button
                 type="submit"
                 disabled={saving}
-                className="col-span-full bg-green-600 px-4 py-2 text-white font-semibold rounded-lg hover:bg-green-700 transition disabled:opacity-50"
+                className="col-span-full bg-green-600 px-6 py-3 text-white font-semibold rounded-lg hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {saving ? "Guardando..." : editingId ? "Actualizar" : "Crear"}{" "}
-                Producto
+                {saving
+                  ? "⏳ Guardando..."
+                  : editingId
+                    ? "✓ Actualizar Producto"
+                    : "✚ Crear Producto"}
               </button>
             </form>
           </div>
@@ -292,22 +322,22 @@ export default function ProductosPage() {
             <table className="w-full">
               <thead className="bg-slate-900/70 border-b border-white/10">
                 <tr>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-slate-300">
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-amber-300">
                     Nombre
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-slate-300">
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-amber-300">
                     Categoría
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-slate-300">
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-amber-300">
                     Material
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-slate-300">
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-amber-300">
                     Precio
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-slate-300">
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-amber-300">
                     Inventario
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-slate-300">
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-amber-300">
                     Acciones
                   </th>
                 </tr>
