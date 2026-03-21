@@ -80,7 +80,12 @@ export default function MaterialesPage() {
       return;
     }
 
-    console.log("handleSave called with editingId:", editingId, "type:", typeof editingId);
+    console.log(
+      "handleSave called with editingId:",
+      editingId,
+      "type:",
+      typeof editingId,
+    );
 
     if (editingId) {
       console.log("Updating material:", editingId, formData);

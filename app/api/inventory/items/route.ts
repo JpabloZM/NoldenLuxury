@@ -2,8 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 console.log("Loading inventory/items route...");
-console.log("NEXT_PUBLIC_SUPABASE_URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✓" : "✗");
-console.log("SUPABASE_SERVICE_ROLE_KEY:", process.env.SUPABASE_SERVICE_ROLE_KEY ? "✓" : "✗");
+console.log(
+  "NEXT_PUBLIC_SUPABASE_URL:",
+  process.env.NEXT_PUBLIC_SUPABASE_URL ? "✓" : "✗",
+);
+console.log(
+  "SUPABASE_SERVICE_ROLE_KEY:",
+  process.env.SUPABASE_SERVICE_ROLE_KEY ? "✓" : "✗",
+);
 
 let supabase: any;
 try {
@@ -66,7 +72,10 @@ export async function GET(request: NextRequest) {
         min_quantity: m.min_quantity,
         unit: m.unit,
         cost_per_unit: m.cost_per_unit,
-        status: m.quantity < m.min_quantity ? ("bajo_stock" as const) : ("normal" as const),
+        status:
+          m.quantity < m.min_quantity
+            ? ("bajo_stock" as const)
+            : ("normal" as const),
       })),
       ...(products || []).map((p: any) => ({
         id: p.id,
@@ -76,7 +85,10 @@ export async function GET(request: NextRequest) {
         min_quantity: 5,
         unit: "Unidad",
         cost_per_unit: p.price,
-        status: (p.inventory || 0) < 5 ? ("bajo_stock" as const) : ("normal" as const),
+        status:
+          (p.inventory || 0) < 5
+            ? ("bajo_stock" as const)
+            : ("normal" as const),
       })),
     ];
 

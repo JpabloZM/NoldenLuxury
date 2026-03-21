@@ -106,8 +106,7 @@ export async function PUT(
     console.log("Material updated successfully:", data);
     return NextResponse.json(data);
   } catch (err) {
-    const errorMessage =
-      err instanceof Error ? err.message : String(err);
+    const errorMessage = err instanceof Error ? err.message : String(err);
     console.error("Error updating material:", errorMessage);
     return NextResponse.json(
       { error: `Server error: ${errorMessage}` },

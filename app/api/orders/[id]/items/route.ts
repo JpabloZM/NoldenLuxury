@@ -37,10 +37,7 @@ export async function POST(
       .single();
 
     if (productError) {
-      return NextResponse.json(
-        { error: "Product not found" },
-        { status: 404 },
-      );
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
     const { data, error } = await supabase
@@ -71,10 +68,7 @@ export async function POST(
       0,
     );
 
-    await supabase
-      .from("orders")
-      .update({ total_amount })
-      .eq("id", orderId);
+    await supabase.from("orders").update({ total_amount }).eq("id", orderId);
 
     return NextResponse.json({
       id: data.id,

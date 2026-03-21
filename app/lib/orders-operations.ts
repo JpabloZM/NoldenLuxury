@@ -30,7 +30,9 @@ export async function fetchRecipesByProduct(
   }
 }
 
-export async function createRecipe(recipe: ProductRecipeForm): Promise<ProductRecipe> {
+export async function createRecipe(
+  recipe: ProductRecipeForm,
+): Promise<ProductRecipe> {
   const response = await fetch("/api/recipes", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -76,7 +78,9 @@ export async function fetchOrders(): Promise<Order[]> {
   }
 }
 
-export async function fetchOrderById(orderId: string): Promise<OrderSummary | null> {
+export async function fetchOrderById(
+  orderId: string,
+): Promise<OrderSummary | null> {
   try {
     const response = await fetch(`/api/orders/${orderId}`, {
       cache: "no-store",

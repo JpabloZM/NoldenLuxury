@@ -60,9 +60,7 @@ export default function PedidosPage() {
       setProducts(productsData);
     } catch (err) {
       console.error("Error loading data:", err);
-      setError(
-        err instanceof Error ? err.message : "Error loading data",
-      );
+      setError(err instanceof Error ? err.message : "Error loading data");
     } finally {
       setIsLoading(false);
     }
@@ -136,7 +134,9 @@ export default function PedidosPage() {
     try {
       setError(null);
       await updateOrderStatus(selectedOrder.id, "confirmed");
-      setSuccessMessage("Pedido confirmado - Productos descontados automáticamente");
+      setSuccessMessage(
+        "Pedido confirmado - Productos descontados automáticamente",
+      );
 
       // Recargar
       await loadData();
@@ -226,7 +226,10 @@ export default function PedidosPage() {
             <h2 className="text-lg font-semibold text-amber-300 mb-4">
               Crear Nuevo Pedido
             </h2>
-            <form onSubmit={handleCreateOrder} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <form
+              onSubmit={handleCreateOrder}
+              className="grid grid-cols-1 md:grid-cols-2 gap-4"
+            >
               <div>
                 <label className="block text-sm font-medium text-slate-300 mb-2">
                   Nombre del Cliente *
@@ -345,7 +348,9 @@ export default function PedidosPage() {
                         {order.customer_name}
                       </p>
                     </div>
-                    <span className={`text-xs px-2 py-1 rounded ${getStatusColor(order.status)}`}>
+                    <span
+                      className={`text-xs px-2 py-1 rounded ${getStatusColor(order.status)}`}
+                    >
                       {order.status}
                     </span>
                   </div>
@@ -364,9 +369,13 @@ export default function PedidosPage() {
                     <h3 className="text-xl font-bold text-amber-300">
                       {selectedOrder.order_number}
                     </h3>
-                    <p className="text-slate-300">{selectedOrder.customer_name}</p>
+                    <p className="text-slate-300">
+                      {selectedOrder.customer_name}
+                    </p>
                   </div>
-                  <span className={`text-xs px-3 py-1 rounded font-semibold ${getStatusColor(selectedOrder.status)}`}>
+                  <span
+                    className={`text-xs px-3 py-1 rounded font-semibold ${getStatusColor(selectedOrder.status)}`}
+                  >
                     {selectedOrder.status}
                   </span>
                 </div>
@@ -374,20 +383,32 @@ export default function PedidosPage() {
                 <div className="space-y-2 text-sm">
                   {selectedOrder.customer_email && (
                     <p className="text-slate-400">
-                      Email: <span className="text-slate-300">{selectedOrder.customer_email}</span>
+                      Email:{" "}
+                      <span className="text-slate-300">
+                        {selectedOrder.customer_email}
+                      </span>
                     </p>
                   )}
                   {selectedOrder.customer_phone && (
                     <p className="text-slate-400">
-                      Teléfono: <span className="text-slate-300">{selectedOrder.customer_phone}</span>
+                      Teléfono:{" "}
+                      <span className="text-slate-300">
+                        {selectedOrder.customer_phone}
+                      </span>
                     </p>
                   )}
                   <p className="text-slate-400">
-                    Total: <span className="text-amber-300 font-bold">${selectedOrder.total_amount?.toFixed(2) || "0.00"}</span>
+                    Total:{" "}
+                    <span className="text-amber-300 font-bold">
+                      ${selectedOrder.total_amount?.toFixed(2) || "0.00"}
+                    </span>
                   </p>
                   {selectedOrder.notes && (
                     <p className="text-slate-400">
-                      Notas: <span className="text-slate-300">{selectedOrder.notes}</span>
+                      Notas:{" "}
+                      <span className="text-slate-300">
+                        {selectedOrder.notes}
+                      </span>
                     </p>
                   )}
                 </div>
@@ -419,7 +440,10 @@ export default function PedidosPage() {
                 </div>
 
                 {showAddItemForm && selectedOrder.status === "pending" && (
-                  <form onSubmit={handleAddItem} className="mb-4 p-4 bg-slate-700 rounded">
+                  <form
+                    onSubmit={handleAddItem}
+                    className="mb-4 p-4 bg-slate-700 rounded"
+                  >
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
                       <select
                         value={newItemData.product_id}
@@ -447,7 +471,10 @@ export default function PedidosPage() {
                         onChange={(e) =>
                           setNewItemData({
                             ...newItemData,
-                            quantity: e.target.value === "" ? 0 : Math.floor(parseInt(e.target.value, 10)) || 1,
+                            quantity:
+                              e.target.value === ""
+                                ? 0
+                                : Math.floor(parseInt(e.target.value, 10)) || 1,
                           })
                         }
                         className="bg-slate-600 border border-slate-500 rounded px-2 py-1 text-white text-sm"
@@ -460,7 +487,10 @@ export default function PedidosPage() {
                         onChange={(e) =>
                           setNewItemData({
                             ...newItemData,
-                            unit_price: e.target.value === "" ? 0 : parseFloat(e.target.value) || 0,
+                            unit_price:
+                              e.target.value === ""
+                                ? 0
+                                : parseFloat(e.target.value) || 0,
                           })
                         }
                         className="bg-slate-600 border border-slate-500 rounded px-2 py-1 text-white text-sm"
@@ -523,7 +553,10 @@ export default function PedidosPage() {
                   </h3>
                   <div className="space-y-2">
                     {selectedOrder.movements.map((movement) => (
-                      <div key={movement.id} className="p-2 bg-slate-700 rounded text-sm">
+                      <div
+                        key={movement.id}
+                        className="p-2 bg-slate-700 rounded text-sm"
+                      >
                         <p className="text-slate-300">
                           <span className="font-semibold text-amber-300">
                             {movement.status}

@@ -51,7 +51,10 @@ export async function POST(request: NextRequest) {
     if (materialError || !materialData) {
       console.error("Error fetching material:", materialError);
       return NextResponse.json(
-        { error: `Material not found with ID: ${material_id}`, details: materialError },
+        {
+          error: `Material not found with ID: ${material_id}`,
+          details: materialError,
+        },
         { status: 404 },
       );
     }

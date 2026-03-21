@@ -2,8 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 console.log("Loading inventory/movements route...");
-console.log("NEXT_PUBLIC_SUPABASE_URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✓" : "✗");
-console.log("SUPABASE_SERVICE_ROLE_KEY:", process.env.SUPABASE_SERVICE_ROLE_KEY ? "✓" : "✗");
+console.log(
+  "NEXT_PUBLIC_SUPABASE_URL:",
+  process.env.NEXT_PUBLIC_SUPABASE_URL ? "✓" : "✗",
+);
+console.log(
+  "SUPABASE_SERVICE_ROLE_KEY:",
+  process.env.SUPABASE_SERVICE_ROLE_KEY ? "✓" : "✗",
+);
 
 let supabase: any;
 try {
@@ -83,10 +89,17 @@ export async function POST(request: NextRequest) {
 
     console.log("=== MOVIMIENTO DETAILS ===");
     console.log("Type:", type, `(should be "produccion" for auto-discount)`);
-    console.log("Item Type:", item_type, `(should be "product" for auto-discount)`);
+    console.log(
+      "Item Type:",
+      item_type,
+      `(should be "product" for auto-discount)`,
+    );
     console.log("Item ID:", item_id);
     console.log("Item Name:", item_name);
-    console.log("Will process material discount?", type === "produccion" && item_type === "product");
+    console.log(
+      "Will process material discount?",
+      type === "produccion" && item_type === "product",
+    );
     console.log("=======================");
 
     // Validación de campos requeridos
@@ -180,7 +193,10 @@ export async function POST(request: NextRequest) {
             .single();
 
           if (materialError) {
-            console.error(`Error fetching material ${material_id}:`, materialError);
+            console.error(
+              `Error fetching material ${material_id}:`,
+              materialError,
+            );
             continue;
           }
 
@@ -188,7 +204,10 @@ export async function POST(request: NextRequest) {
           const current_quantity = Math.floor(
             Number(materialData?.quantity || 0),
           );
-          const new_quantity = Math.max(0, current_quantity - material_consumed);
+          const new_quantity = Math.max(
+            0,
+            current_quantity - material_consumed,
+          );
 
           console.log(
             `Material: ${material_name}, before: ${current_quantity}, after: ${new_quantity}, consumed: ${material_consumed}`,
@@ -211,7 +230,9 @@ export async function POST(request: NextRequest) {
             continue;
           }
 
-          console.log(`Material ${material_name} quantity updated successfully`);
+          console.log(
+            `Material ${material_name} quantity updated successfully`,
+          );
 
           // Registrar el movimiento de producción para el material
           const { error: movementError } = await supabase

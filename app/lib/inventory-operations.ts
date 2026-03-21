@@ -13,16 +13,19 @@ export async function fetchMovements(
     console.log("Fetching inventory movements");
     // Agregar timestamp para forzar actualización y evitar cache
     const timestamp = new Date().getTime();
-    const response = await fetch(`/api/inventory/movements?limit=${limit}&t=${timestamp}`, {
-      method: "GET",
-      headers: { 
-        "Content-Type": "application/json",
-        "Cache-Control": "no-cache, no-store, must-revalidate",
-        "Pragma": "no-cache",
-        "Expires": "0",
+    const response = await fetch(
+      `/api/inventory/movements?limit=${limit}&t=${timestamp}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+        cache: "no-store",
       },
-      cache: "no-store",
-    });
+    );
 
     if (!response.ok) {
       throw new Error(`Failed to fetch movements: ${response.statusText}`);
@@ -74,11 +77,11 @@ export async function fetchInventorySummary(): Promise<InventorySummary> {
     const timestamp = new Date().getTime();
     const response = await fetch(`/api/inventory/summary?t=${timestamp}`, {
       method: "GET",
-      headers: { 
+      headers: {
         "Content-Type": "application/json",
         "Cache-Control": "no-cache, no-store, must-revalidate",
-        "Pragma": "no-cache",
-        "Expires": "0",
+        Pragma: "no-cache",
+        Expires: "0",
       },
       cache: "no-store",
     });
@@ -104,11 +107,11 @@ export async function fetchInventoryItems(): Promise<InventoryItem[]> {
     const timestamp = new Date().getTime();
     const response = await fetch(`/api/inventory/items?t=${timestamp}`, {
       method: "GET",
-      headers: { 
+      headers: {
         "Content-Type": "application/json",
         "Cache-Control": "no-cache, no-store, must-revalidate",
-        "Pragma": "no-cache",
-        "Expires": "0",
+        Pragma: "no-cache",
+        Expires: "0",
       },
       cache: "no-store",
     });

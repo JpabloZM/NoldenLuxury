@@ -20,7 +20,12 @@ export interface ProductRecipeForm {
 }
 
 // ÓRDENES / PEDIDOS
-export type OrderStatus = "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
+export type OrderStatus =
+  | "pending"
+  | "confirmed"
+  | "shipped"
+  | "delivered"
+  | "cancelled";
 
 export interface Order {
   id: string;

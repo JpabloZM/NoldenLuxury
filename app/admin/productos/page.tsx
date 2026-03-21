@@ -69,8 +69,8 @@ export default function ProductosPage() {
         cache: "no-store",
         headers: {
           "Cache-Control": "no-cache, no-store, must-revalidate",
-          "Pragma": "no-cache",
-          "Expires": "0",
+          Pragma: "no-cache",
+          Expires: "0",
         },
       });
       if (!response.ok) return [];
@@ -144,16 +144,19 @@ export default function ProductosPage() {
           // SI HAY MATERIALES, DESCONTAR AUTOMÁTICAMENTE
           if (materialsUsed.length > 0) {
             try {
-              const response = await fetch("/api/products/register-production", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  product_id: newProduct.id,
-                  product_name: newProduct.name,
-                  quantity_produced: formData.inventory,
-                  materials_used: materialsUsed,
-                }),
-              });
+              const response = await fetch(
+                "/api/products/register-production",
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    product_id: newProduct.id,
+                    product_name: newProduct.name,
+                    quantity_produced: formData.inventory,
+                    materials_used: materialsUsed,
+                  }),
+                },
+              );
 
               if (!response.ok) {
                 const errorData = await response.json();
@@ -319,7 +322,10 @@ export default function ProductosPage() {
                     onChange={(e) =>
                       setFormData({
                         ...formData,
-                        inventory: e.target.value === "" ? 0 : Math.floor(parseInt(e.target.value, 10)) || 0,
+                        inventory:
+                          e.target.value === ""
+                            ? 0
+                            : Math.floor(parseInt(e.target.value, 10)) || 0,
                       })
                     }
                     required

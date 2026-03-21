@@ -103,7 +103,9 @@ export async function POST(request: NextRequest) {
           recipeError,
         );
       } else {
-        console.log(`Recipe created for ${product_id}: ${quantity_used / quantity_produced}${material.unit || "g"} per unit`);
+        console.log(
+          `Recipe created for ${product_id}: ${quantity_used / quantity_produced}${material.unit || "g"} per unit`,
+        );
       }
     }
 
@@ -124,10 +126,7 @@ export async function POST(request: NextRequest) {
       });
 
     if (productMovementError) {
-      console.error(
-        "Error creating product movement:",
-        productMovementError,
-      );
+      console.error("Error creating product movement:", productMovementError);
     }
 
     console.log("Production registered successfully");

@@ -45,10 +45,11 @@ async function cleanupDatabase() {
 
         // Intentar borrar TODO
         console.log(`   🔄 Attempting DELETE...`);
-        const { data: deleteData, error: deleteError, status } = await supabase
-          .from(table)
-          .delete()
-          .neq("id", "");
+        const {
+          data: deleteData,
+          error: deleteError,
+          status,
+        } = await supabase.from(table).delete().neq("id", "");
 
         console.log(`   Status: ${status}`);
         if (deleteError) {

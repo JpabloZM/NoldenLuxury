@@ -35,7 +35,9 @@ export async function POST(request: NextRequest) {
       .select("id", { count: "exact", head: true });
 
     const afterCount = after?.length || 0;
-    console.log(`Cleanup complete. Deleted: ${beforeCount - afterCount} movements`);
+    console.log(
+      `Cleanup complete. Deleted: ${beforeCount - afterCount} movements`,
+    );
 
     return NextResponse.json({
       success: true,

@@ -9,8 +9,8 @@ export async function fetchMaterials(): Promise<Material[]> {
       cache: "no-store",
       headers: {
         "Cache-Control": "no-cache, no-store, must-revalidate",
-        "Pragma": "no-cache",
-        "Expires": "0",
+        Pragma: "no-cache",
+        Expires: "0",
       },
     });
 
@@ -76,7 +76,14 @@ export async function updateMaterial(
   data: Partial<MaterialForm>,
 ): Promise<Material | null> {
   try {
-    console.log("updateMaterial called with id:", id, "type:", typeof id, "data:", data);
+    console.log(
+      "updateMaterial called with id:",
+      id,
+      "type:",
+      typeof id,
+      "data:",
+      data,
+    );
 
     // Validar que el ID no es undefined o vacío
     if (!id) {
@@ -111,7 +118,10 @@ export async function updateMaterial(
     console.log("Material updated successfully:", result);
     return result;
   } catch (err) {
-    console.error("Error in updateMaterial:", err instanceof Error ? err.message : String(err));
+    console.error(
+      "Error in updateMaterial:",
+      err instanceof Error ? err.message : String(err),
+    );
     return null;
   }
 }

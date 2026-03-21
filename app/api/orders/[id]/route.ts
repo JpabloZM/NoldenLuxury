@@ -49,10 +49,7 @@ export async function GET(
 
     if (itemsError) {
       console.error("Error fetching order items:", itemsError);
-      return NextResponse.json(
-        { error: itemsError.message },
-        { status: 500 },
-      );
+      return NextResponse.json({ error: itemsError.message }, { status: 500 });
     }
 
     const { data: movementsData, error: movementsError } = await supabase
@@ -125,7 +122,11 @@ export async function PATCH(
     }
 
     // Si confirmamos (cambiar a "confirmed"), descontar productos
-    if (confirm && status === "confirmed" && currentOrder.status !== "confirmed") {
+    if (
+      confirm &&
+      status === "confirmed" &&
+      currentOrder.status !== "confirmed"
+    ) {
       // Obtener items de la orden
       const { data: items, error: itemsError } = await supabase
         .from("order_items")
@@ -133,7 +134,10 @@ export async function PATCH(
         .eq("order_id", orderId);
 
       if (itemsError) {
-        return NextResponse.json({ error: itemsError.message }, { status: 500 });
+        return NextResponse.json(
+          { error: itemsError.message },
+          { status: 500 },
+        );
       }
 
       // Descontar cada producto del inventario y registrar movimiento
@@ -189,7 +193,9 @@ export async function PATCH(
     await supabase.from("order_movements").insert({
       order_id: orderId,
       status,
-      reason: confirm ? "Orden confirmada y productos descontados" : `Estado actualizado a ${status}`,
+      reason: confirm
+        ? "Orden confirmada y productos descontados"
+        : `Estado actualizado a ${status}`,
     });
 
     return NextResponse.json(updatedOrder);

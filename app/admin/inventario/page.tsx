@@ -256,7 +256,10 @@ export default function InventoryPage() {
               {/* Item Name - Combobox with search */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Item * <span className="text-slate-400 font-normal">(Escribe para buscar)</span>
+                  Item *{" "}
+                  <span className="text-slate-400 font-normal">
+                    (Escribe para buscar)
+                  </span>
                 </label>
                 <div className="relative">
                   <input
@@ -318,11 +321,18 @@ export default function InventoryPage() {
                   type="number"
                   step="1"
                   min="0"
-                  value={formData.quantity_before === 0 && !formData.item_id ? "" : formData.quantity_before}
+                  value={
+                    formData.quantity_before === 0 && !formData.item_id
+                      ? ""
+                      : formData.quantity_before
+                  }
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      quantity_before: e.target.value === "" ? 0 : Math.floor(parseInt(e.target.value, 10)) || 0,
+                      quantity_before:
+                        e.target.value === ""
+                          ? 0
+                          : Math.floor(parseInt(e.target.value, 10)) || 0,
                     })
                   }
                   className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white"
@@ -342,7 +352,10 @@ export default function InventoryPage() {
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      quantity_changed: e.target.value === "" ? 0 : Math.floor(parseInt(e.target.value, 10)) || 0,
+                      quantity_changed:
+                        e.target.value === ""
+                          ? 0
+                          : Math.floor(parseInt(e.target.value, 10)) || 0,
                     })
                   }
                   className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white"
