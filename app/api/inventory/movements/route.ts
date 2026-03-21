@@ -100,7 +100,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const quantity_after = quantity_before + quantity_changed;
+    // Ensure all quantities are integers
+    const qty_before = Math.floor(Number(quantity_before));
+    const qty_changed = Math.floor(Number(quantity_changed));
+    const quantity_after = qty_before + qty_changed;
 
     const { data, error } = await supabase
       .from("inventory_movements")
@@ -109,9 +112,9 @@ export async function POST(request: NextRequest) {
         item_type,
         item_id,
         item_name,
-        quantity_before,
+        quantity_before: qty_before,
         quantity_after,
-        quantity_changed,
+        quantity_changed: qty_changed,
         reason: reason || null,
         reference_code: reference_code || null,
         created_by: created_by || null,

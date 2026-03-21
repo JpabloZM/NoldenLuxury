@@ -305,12 +305,14 @@ export default function ProductosPage() {
                   />
                   <input
                     type="number"
+                    step="1"
+                    min="0"
                     placeholder="Cantidad"
                     value={formData.inventory || ""}
                     onChange={(e) =>
                       setFormData({
                         ...formData,
-                        inventory: e.target.value === "" ? 0 : parseInt(e.target.value, 10) || 0,
+                        inventory: e.target.value === "" ? 0 : Math.floor(parseInt(e.target.value, 10)) || 0,
                       })
                     }
                     required

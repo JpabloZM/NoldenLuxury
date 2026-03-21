@@ -87,8 +87,8 @@ export default function InventoryPage() {
         item_type: formData.item_type,
         item_id: formData.item_id,
         item_name: formData.item_name,
-        quantity_before: formData.quantity_before,
-        quantity_changed: formData.quantity_changed,
+        quantity_before: Math.floor(formData.quantity_before),
+        quantity_changed: Math.floor(formData.quantity_changed),
         reason: formData.reason || undefined,
       });
 
@@ -316,11 +316,13 @@ export default function InventoryPage() {
                 </label>
                 <input
                   type="number"
+                  step="1"
+                  min="0"
                   value={formData.quantity_before === 0 && !formData.item_id ? "" : formData.quantity_before}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      quantity_before: e.target.value === "" ? 0 : parseInt(e.target.value, 10) || 0,
+                      quantity_before: e.target.value === "" ? 0 : Math.floor(parseInt(e.target.value, 10)) || 0,
                     })
                   }
                   className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white"
@@ -335,11 +337,12 @@ export default function InventoryPage() {
                 </label>
                 <input
                   type="number"
+                  step="1"
                   value={formData.quantity_changed}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      quantity_changed: e.target.value === "" ? 0 : parseInt(e.target.value, 10) || 0,
+                      quantity_changed: e.target.value === "" ? 0 : Math.floor(parseInt(e.target.value, 10)) || 0,
                     })
                   }
                   className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white"

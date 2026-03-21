@@ -441,16 +441,17 @@ export default function PedidosPage() {
 
                       <input
                         type="number"
+                        step="1"
+                        min="1"
                         value={newItemData.quantity || ""}
                         onChange={(e) =>
                           setNewItemData({
                             ...newItemData,
-                            quantity: e.target.value === "" ? 0 : parseInt(e.target.value, 10) || 1,
+                            quantity: e.target.value === "" ? 0 : Math.floor(parseInt(e.target.value, 10)) || 1,
                           })
                         }
                         className="bg-slate-600 border border-slate-500 rounded px-2 py-1 text-white text-sm"
                         placeholder="Cantidad"
-                        min="1"
                       />
 
                       <input
