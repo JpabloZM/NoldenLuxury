@@ -66,6 +66,28 @@ export async function POST(request: NextRequest) {
     }
 
     console.log("Material created:", data);
+
+    // Registrar movimiento de inventario (entrada) automáticamente
+    if (data && data.id && quantity > 0) {
+      const { error: movementError } = await supabase
+        .from("inventory_movements")
+        .insert([
+          {
+            material_id: data.id,
+            type: "entrada",
+            quantity_moved: quantity,
+            notes: `Material creado: ${name}`,
+            reference_code: `MAT-${data.id}`,
+          },
+        ]);
+
+      if (movementError) {
+        console.error("Error registering inventory movement:", movementError);
+        // No retornamos error aquí porque el material ya fue creado
+        // Solo registramos el error en los logs
+      }
+    }
+
     return NextResponse.json(data, { status: 201 });
   } catch (err) {
     console.error("Error creating material:", err);
