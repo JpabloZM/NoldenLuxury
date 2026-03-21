@@ -253,21 +253,39 @@ export default function InventoryPage() {
                 </select>
               </div>
 
-              {/* Item Name */}
+              {/* Item Name - Select dropdown */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-slate-300 mb-2">
                   Item *
                 </label>
-                <input
-                  type="text"
-                  value={formData.item_name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, item_name: e.target.value })
-                  }
-                  placeholder="Nombre del item"
-                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500"
-                  onFocus={(e) => e.currentTarget.select()}
-                />
+                <select
+                  value={formData.item_id}
+                  onChange={(e) => {
+                    const selectedItem = items.find(
+                      (item) =>
+                        item.id === e.target.value &&
+                        item.type === formData.item_type,
+                    );
+                    if (selectedItem) {
+                      setFormData({
+                        ...formData,
+                        item_id: selectedItem.id,
+                        item_name: selectedItem.name,
+                        quantity_before: selectedItem.quantity,
+                      });
+                    }
+                  }}
+                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white"
+                >
+                  <option value="">Selecciona un item...</option>
+                  {items
+                    .filter((item) => item.type === formData.item_type)
+                    .map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.name} (Stock: {item.quantity})
+                      </option>
+                    ))}
+                </select>
               </div>
 
               {/* Cantidad Anterior */}
