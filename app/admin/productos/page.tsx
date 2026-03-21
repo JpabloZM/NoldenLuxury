@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import AdminLayout from "../components/AdminLayout";
 import type { ProductWithInventory } from "@/app/lib/admin-types";
+import type { Material } from "@/app/lib/admin-types";
 import {
   fetchProducts,
   createProduct,
@@ -11,15 +12,24 @@ import {
   deleteProduct,
 } from "@/app/lib/product-operations";
 
+interface MaterialUsed {
+  material_id: string;
+  material_name: string;
+  quantity_used: number;
+}
+
 export default function ProductosPage() {
   const router = useRouter();
   const [products, setProducts] = useState<ProductWithInventory[]>([]);
+  const [materials, setMaterials] = useState<Material[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string>("");
+  const [materialsUsed, setMaterialsUsed] = useState<MaterialUsed[]>([]);
+
   const [formData, setFormData] = useState({
     name: "",
     category: "Anillos" as const,
@@ -35,14 +45,37 @@ export default function ProductosPage() {
       router.replace("/admin/login");
       return;
     }
-    loadProducts();
+    loadData();
   }, [router]);
 
-  const loadProducts = async () => {
+  const loadData = async () => {
     setLoading(true);
-    const data = await fetchProducts();
-    setProducts(data);
+    const [productsData, materialsData] = await Promise.all([
+      fetchProducts(),
+      fetchMaterials(),
+    ]);
+    setProducts(productsData);
+    setMaterials(materialsData);
     setLoading(false);
+  };
+
+  const fetchMaterials = async () => {
+    try {
+      const response = await fetch("/api/materials", {
+        cache: "no-store",
+      });
+      if (!response.ok) return [];
+      const data = await response.json();
+      return data.map((m: any) => ({
+        id: m.id,
+        name: m.name,
+        quantity: m.quantity,
+        unit: m.unit || "g",
+      }));
+    } catch (err) {
+      console.error("Error fetching materials:", err);
+      return [];
+    }
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,30 +119,64 @@ export default function ProductosPage() {
     e.preventDefault();
     setSaving(true);
 
-    if (editingId) {
-      const updated = await updateProduct(editingId, formData);
-      if (updated) {
-        setProducts(products.map((p) => (p.id === editingId ? updated : p)));
-      }
-      setEditingId(null);
-    } else {
-      const newProduct = await createProduct(formData);
-      if (newProduct) {
-        setProducts([newProduct, ...products]);
-      }
-    }
+    try {
+      if (editingId) {
+        const updated = await updateProduct(editingId, formData);
+        if (updated) {
+          setProducts(products.map((p) => (p.id === editingId ? updated : p)));
+        }
+        setEditingId(null);
+      } else {
+        // Crear producto
+        const newProduct = await createProduct(formData);
+        if (newProduct) {
+          setProducts([newProduct, ...products]);
 
-    setFormData({
-      name: "",
-      category: "Anillos",
-      material: "Oro Laminado 18K",
-      price: 0,
-      image: "",
-      inventory: 0,
-    });
-    setImagePreview("");
-    setShowForm(false);
-    setSaving(false);
+          // SI HAY MATERIALES, DESCONTAR AUTOMÁTICAMENTE
+          if (materialsUsed.length > 0) {
+            try {
+              const response = await fetch("/api/products/register-production", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  product_id: newProduct.id,
+                  product_name: newProduct.name,
+                  quantity_produced: formData.inventory,
+                  materials_used: materialsUsed,
+                }),
+              });
+
+              if (!response.ok) {
+                const errorData = await response.json();
+                alert(`Error al registrar movimientos: ${errorData.error}`);
+              }
+            } catch (err) {
+              console.error("Error registering production:", err);
+              alert(
+                "Error al registrar movimientos de materiales. Se creó el producto pero no se descontaron los materiales.",
+              );
+            }
+          }
+        }
+      }
+
+      setFormData({
+        name: "",
+        category: "Anillos",
+        material: "Oro Laminado 18K",
+        price: 0,
+        image: "",
+        inventory: 0,
+      });
+      setMaterialsUsed([]);
+      setImagePreview("");
+      setShowForm(false);
+      setSaving(false);
+      await loadData();
+    } catch (err) {
+      console.error("Error in handleSubmit:", err);
+      setSaving(false);
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -286,6 +353,104 @@ export default function ProductosPage() {
                   </div>
                 )}
               </div>
+
+              {/* Sección de Materiales - Solo para nuevos productos */}
+              {!editingId && (
+                <div className="col-span-full">
+                  <h3 className="text-lg font-semibold text-amber-300 mb-4">
+                    Materiales Utilizados (Opcional)
+                  </h3>
+
+                  {materialsUsed.length > 0 && (
+                    <div className="mb-4 space-y-2">
+                      {materialsUsed.map((mat, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between bg-slate-700 p-3 rounded"
+                        >
+                          <div>
+                            <p className="text-white font-medium">
+                              {mat.material_name}
+                            </p>
+                            <p className="text-sm text-slate-400">
+                              {mat.quantity_used}g
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setMaterialsUsed(
+                                materialsUsed.filter((_, i) => i !== idx),
+                              )
+                            }
+                            className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
+                          >
+                            Quitar
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <select
+                      id="material-select"
+                      defaultValue=""
+                      className="rounded-lg border border-white/10 bg-slate-800 px-4 py-3 text-white focus:border-amber-300 outline-none"
+                    >
+                      <option value="">Selecciona material...</option>
+                      {materials.map((mat) => (
+                        <option key={mat.id} value={mat.id}>
+                          {mat.name}
+                        </option>
+                      ))}
+                    </select>
+
+                    <input
+                      type="number"
+                      id="material-quantity"
+                      placeholder="Cantidad (g)"
+                      min="0.1"
+                      step="0.1"
+                      defaultValue=""
+                      className="rounded-lg border border-white/10 bg-slate-800 px-4 py-3 text-white placeholder:text-slate-500 focus:border-amber-300 outline-none"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const select = document.getElementById(
+                          "material-select",
+                        ) as HTMLSelectElement;
+                        const quantity = document.getElementById(
+                          "material-quantity",
+                        ) as HTMLInputElement;
+
+                        if (select.value && quantity.value) {
+                          const selectedMaterial = materials.find(
+                            (m) => m.id === select.value,
+                          );
+                          if (selectedMaterial) {
+                            setMaterialsUsed([
+                              ...materialsUsed,
+                              {
+                                material_id: select.value,
+                                material_name: selectedMaterial.name,
+                                quantity_used: parseFloat(quantity.value),
+                              },
+                            ]);
+                            select.value = "";
+                            quantity.value = "";
+                          }
+                        }
+                      }}
+                      className="bg-blue-600 text-white px-4 py-3 rounded-lg font-semibold hover:bg-blue-700"
+                    >
+                      Agregar Material
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Botón - Ancho completo */}
               <button
