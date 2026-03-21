@@ -69,11 +69,24 @@ export async function updateMaterial(
   data: Partial<MaterialForm>,
 ): Promise<Material | null> {
   try {
-    const response = await fetch(`/api/materials/${id}`, {
+    console.log("updateMaterial called with id:", id, "data:", data);
+
+    // Validar que el ID no es undefined o vacío
+    if (!id || id.trim() === "" || id === "undefined") {
+      console.error("Invalid ID provided to updateMaterial:", id);
+      return null;
+    }
+
+    const url = `/api/materials/${id}`;
+    console.log("Fetching from URL:", url);
+
+    const response = await fetch(url, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
+
+    console.log("Response status:", response.status);
 
     if (!response.ok) {
       let errorMessage = "Unknown error";
@@ -87,7 +100,9 @@ export async function updateMaterial(
       return null;
     }
 
-    return await response.json();
+    const result = await response.json();
+    console.log("Material updated successfully:", result);
+    return result;
   } catch (err) {
     console.error("Error in updateMaterial:", err instanceof Error ? err.message : String(err));
     return null;

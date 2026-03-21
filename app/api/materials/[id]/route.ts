@@ -44,8 +44,19 @@ export async function PUT(
 ) {
   try {
     const { id } = params;
+    console.log("PUT /api/materials/[id] - ID:", id);
+
+    // Validar que el ID sea válido (no undefined, no vacío)
+    if (!id || id === "undefined" || id.trim() === "") {
+      console.error("Invalid material ID:", id);
+      return NextResponse.json(
+        { error: "Invalid material ID provided" },
+        { status: 400 },
+      );
+    }
+
     const body = await request.json();
-    console.log("PUT /api/materials/[id] - ID:", id, "Body:", body);
+    console.log("PUT request body:", body);
 
     // Solo permitir actualizar estos campos
     const allowedFields = [
@@ -67,7 +78,7 @@ export async function PUT(
     // Agregar timestamp de actualización
     updateData.last_updated = new Date().toISOString();
 
-    console.log("Updating material with data:", updateData);
+    console.log("Updating material ID:", id, "with data:", updateData);
 
     const { data, error } = await supabase
       .from("materials")
