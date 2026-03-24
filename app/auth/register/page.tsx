@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { createCustomer } from "@/app/lib/customers-operations";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -27,7 +28,13 @@ export default function RegisterPage() {
     setError("");
 
     // Validaciones
-    if (!formData.nombre || !formData.email || !formData.password || !formData.ciudad || !formData.direccionEntrega) {
+    if (
+      !formData.nombre ||
+      !formData.email ||
+      !formData.password ||
+      !formData.ciudad ||
+      !formData.direccionEntrega
+    ) {
       setError("Por favor completa todos los campos requeridos");
       return;
     }
@@ -69,6 +76,24 @@ export default function RegisterPage() {
       clientes.push(nuevoCliente);
       localStorage.setItem("clientes", JSON.stringify(clientes));
 
+      // Crear también en Supabase para que aparezca en admin/clientes
+      try {
+        await createCustomer({
+          name: formData.nombre,
+          email: formData.email,
+          phone: formData.telefono,
+          address: formData.direccionEntrega,
+          city: formData.ciudad,
+          state: "",
+          zip_code: "",
+          notes: "",
+          source: "registered",
+        });
+      } catch (supabaseError) {
+        console.warn("Cliente guardado localmente pero no en Supabase:", supabaseError);
+        // No bloqueamos el registro si falla Supabase
+      }
+
       // Login automático
       localStorage.setItem("clienteToken", nuevoCliente.id);
       localStorage.setItem("clienteEmail", nuevoCliente.email);
@@ -90,7 +115,11 @@ export default function RegisterPage() {
             <p className="mt-2 text-sm text-amber-200">Crea tu cuenta</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-4"
+            autoComplete="off"
+          >
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
                 Nombre Completo
@@ -210,12 +239,18 @@ export default function RegisterPage() {
 
           <p className="mt-6 text-center text-sm text-slate-400">
             ¿Ya tienes cuenta?{" "}
-            <Link href="/auth/login" className="text-amber-300 hover:text-amber-200">
+            <Link
+              href="/auth/login"
+              className="text-amber-300 hover:text-amber-200"
+            >
               Inicia sesión aquí
             </Link>
           </p>
 
-          <Link href="/" className="mt-4 block text-center text-xs text-slate-500 hover:text-slate-400">
+          <Link
+            href="/"
+            className="mt-4 block text-center text-xs text-slate-500 hover:text-slate-400"
+          >
             Volver a inicio
           </Link>
         </div>
