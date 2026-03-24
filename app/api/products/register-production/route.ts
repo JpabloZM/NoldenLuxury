@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       product_name,
       quantity_produced,
       materials_used_count: materials_used.length,
-      materials_used: materials_used.map(m => ({
+      materials_used: materials_used.map((m: any) => ({
         name: m.material_name,
         per_unit: m.quantity_used,
         total: m.quantity_used * quantity_produced
