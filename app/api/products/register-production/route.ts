@@ -30,6 +30,11 @@ export async function POST(request: NextRequest) {
       product_name,
       quantity_produced,
       materials_used_count: materials_used.length,
+      materials_used: materials_used.map(m => ({
+        name: m.material_name,
+        per_unit: m.quantity_used,
+        total: m.quantity_used * quantity_produced
+      }))
     });
 
     // Por cada material usado: descontar y registrar movimiento
@@ -48,8 +53,10 @@ export async function POST(request: NextRequest) {
         continue;
       }
 
+      // quantity_used es la cantidad POR UNIDAD, multiplicar por cantidad total producida
+      const total_quantity_used = quantity_used * quantity_produced;
       const quantity_before = materialData?.quantity || 0;
-      const quantity_changed = -quantity_used; // Negativo porque se descuenta
+      const quantity_changed = -total_quantity_used; // Negativo porque se descuenta
       const quantity_after = quantity_before + quantity_changed;
 
       // Actualizar cantidad de material
@@ -74,7 +81,7 @@ export async function POST(request: NextRequest) {
           quantity_before,
           quantity_after,
           quantity_changed,
-          reason: `Producción: ${product_name} x${quantity_produced}`,
+          reason: `Producción: ${product_name} x${quantity_produced} unidades (${quantity_used} ${material.unit} por unidad)`,
           reference_code: product_id,
           created_by: "SISTEMA_PRODUCCION",
         });
@@ -84,15 +91,20 @@ export async function POST(request: NextRequest) {
           `Error creating movement for material ${material_id}:`,
           movementError,
         );
+      } else {
+        console.log(
+          `Material descuento: ${material_name} - Before: ${quantity_before}, After: ${quantity_after}, Changed: ${quantity_changed}`,
+        );
       }
 
-      // Crear receta (product_recipe)
+      // Crear receta (product_recipe) - quantity_needed es la cantidad POR UNIDAD
+      const quantity_per_unit = quantity_used / quantity_produced;
       const { error: recipeError } = await supabase
         .from("product_recipes")
         .upsert({
           product_id,
           material_id,
-          quantity_per_unit: quantity_used / quantity_produced, // Cantidad por unidad producida
+          quantity_needed: quantity_per_unit, // Cantidad necesaria POR UNIDAD
           unit: material.unit || "g", // Usar la unidad del material
           created_at: new Date().toISOString(),
         });
@@ -104,7 +116,7 @@ export async function POST(request: NextRequest) {
         );
       } else {
         console.log(
-          `Recipe created for ${product_id}: ${quantity_used / quantity_produced}${material.unit || "g"} per unit`,
+          `✓ Recipe saved: ${product_id} uses ${quantity_per_unit}${material.unit || "g"} of ${material_name} per unit`,
         );
       }
     }

@@ -372,9 +372,14 @@ export default function ProductosPage() {
               {/* Sección de Materiales - Solo para nuevos productos */}
               {!editingId && (
                 <div className="col-span-full">
-                  <h3 className="text-lg font-semibold text-amber-300 mb-4">
-                    Materiales Utilizados (Opcional)
-                  </h3>
+                  <div className="flex items-center gap-2 mb-4">
+                    <h3 className="text-lg font-semibold text-amber-300">
+                      Materiales Por Unidad (Opcional)
+                    </h3>
+                    <span className="text-xs text-slate-400 bg-slate-700 px-2 py-1 rounded">
+                      Especifica la cantidad de materiales para 1 {formData.name || "unidad"}. El sistema multiplicará por la cantidad total a crear.
+                    </span>
+                  </div>
 
                   {materialsUsed.length > 0 && (
                     <div className="mb-4 space-y-2">
@@ -387,8 +392,11 @@ export default function ProductosPage() {
                             <p className="text-white font-medium">
                               {mat.material_name}
                             </p>
-                            <p className="text-sm text-slate-400">
-                              {mat.quantity_used} {mat.unit}
+                            <p className="text-sm text-amber-300">
+                              {mat.quantity_used} {mat.unit} por unidad
+                            </p>
+                            <p className="text-xs text-slate-400">
+                              Total: {(mat.quantity_used * formData.inventory).toFixed(1)} {mat.unit} (para {formData.inventory} unidades)
                             </p>
                           </div>
                           <button
@@ -431,10 +439,11 @@ export default function ProductosPage() {
                       <input
                         type="number"
                         id="material-quantity"
-                        placeholder={`Cantidad (${selectedMaterialUnit})`}
+                        placeholder={`Cantidad por unidad (${selectedMaterialUnit})`}
                         min="0.1"
                         step="0.1"
                         defaultValue=""
+                        title="Ingresa la cantidad de material necesaria para 1 unidad. Si creas 2 unidades, se multiplicará automáticamente."
                         className="rounded-lg border border-white/10 bg-slate-800 px-4 py-3 text-white placeholder:text-slate-500 focus:border-amber-300 outline-none w-full"
                       />
                     </div>
