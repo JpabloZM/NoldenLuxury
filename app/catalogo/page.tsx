@@ -149,47 +149,47 @@ export default function CatalogoPage() {
             </div>
           ) : (
             filteredProducts.map((product) => (
-            <article
-              key={product.id}
-              className="group relative flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-900/70"
-            >
-              <div className="relative h-64 w-full bg-slate-800">
-                <Image
-                  src={product.image}
-                  alt={product.name}
-                  fill
-                  className="object-contain p-6 transition-transform duration-300 group-hover:scale-105"
-                />
-              </div>
-              <div className="flex flex-1 flex-col p-6">
-                <p className="text-xs font-semibold uppercase tracking-wider text-amber-300">
-                  {product.material}
-                </p>
-                <h3 className="mt-2 text-lg font-semibold text-white">
-                  {product.name}
-                </h3>
-                <p className="mt-1 text-sm text-slate-400">
-                  {product.category}
-                </p>
-                <p className="mt-4 text-2xl font-bold text-white">
-                  ${product.price}
-                </p>
-                <div className="mt-auto space-y-2">
-                  <button
-                    onClick={() => handleAgregarAlCarrito(product)}
-                    className="w-full rounded-lg bg-amber-300 px-4 py-2.5 text-center text-sm font-semibold text-slate-900 transition hover:bg-amber-200"
-                  >
-                    🛒 Agregar al Carrito
-                  </button>
-                  <button
-                    onClick={() => handleAsesoriaPersonalizada(product)}
-                    className="w-full rounded-lg bg-slate-800 px-4 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-slate-700"
-                  >
-                    💬 Asesoría Personalizada
-                  </button>
+              <article
+                key={product.id}
+                className="group relative flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-900/70"
+              >
+                <div className="relative h-64 w-full bg-slate-800">
+                  <Image
+                    src={product.image}
+                    alt={product.name}
+                    fill
+                    className="object-contain p-6 transition-transform duration-300 group-hover:scale-105"
+                  />
                 </div>
-              </div>
-            </article>
+                <div className="flex flex-1 flex-col p-6">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-amber-300">
+                    {product.material}
+                  </p>
+                  <h3 className="mt-2 text-lg font-semibold text-white">
+                    {product.name}
+                  </h3>
+                  <p className="mt-1 text-sm text-slate-400">
+                    {product.category}
+                  </p>
+                  <p className="mt-4 text-2xl font-bold text-white">
+                    ${product.price}
+                  </p>
+                  <div className="mt-auto space-y-2">
+                    <button
+                      onClick={() => handleAgregarAlCarrito(product)}
+                      className="w-full rounded-lg bg-amber-300 px-4 py-2.5 text-center text-sm font-semibold text-slate-900 transition hover:bg-amber-200"
+                    >
+                      🛒 Agregar al Carrito
+                    </button>
+                    <button
+                      onClick={() => handleAsesoriaPersonalizada(product)}
+                      className="w-full rounded-lg bg-slate-800 px-4 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-slate-700"
+                    >
+                      💬 Asesoría Personalizada
+                    </button>
+                  </div>
+                </div>
+              </article>
             ))
           )}
         </div>
