@@ -164,9 +164,7 @@ export default function PedidosPage() {
   };
 
   const handleRemoveItemFromTemp = (tempId: string) => {
-    setTempOrderItems(
-      tempOrderItems.filter((item) => item.id !== tempId),
-    );
+    setTempOrderItems(tempOrderItems.filter((item) => item.id !== tempId));
   };
 
   const handleCreateOrder = async (e: React.FormEvent) => {
@@ -626,7 +624,7 @@ export default function PedidosPage() {
                             {item.product_name}
                           </p>
                           <p className="text-sm text-slate-400">
-                            {item.quantity} × ${item.unit_price.toFixed(2)} = 
+                            {item.quantity} × ${item.unit_price.toFixed(2)} =
                             <span className="text-amber-300 font-semibold ml-1">
                               ${item.subtotal.toFixed(2)}
                             </span>
@@ -649,7 +647,9 @@ export default function PedidosPage() {
               {tempOrderItems.length > 0 && (
                 <div className="bg-slate-700 p-4 rounded border border-amber-500/50">
                   <div className="flex justify-between items-center">
-                    <p className="text-lg font-bold text-white">Total del Pedido:</p>
+                    <p className="text-lg font-bold text-white">
+                      Total del Pedido:
+                    </p>
                     <p className="text-3xl font-bold text-amber-300">
                       ${calcularTotal().toFixed(2)}
                     </p>
@@ -683,7 +683,11 @@ export default function PedidosPage() {
                       customer_phone: "",
                       notes: "",
                     });
-                    setNewItemData({ product_id: "", quantity: 1, unit_price: 0 });
+                    setNewItemData({
+                      product_id: "",
+                      quantity: 1,
+                      unit_price: 0,
+                    });
                   }}
                   className="flex-1 bg-slate-700 text-white px-4 py-2.5 rounded font-semibold hover:bg-slate-600 transition"
                 >
