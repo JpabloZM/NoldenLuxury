@@ -90,7 +90,7 @@ export default function RegisterPage() {
             <p className="mt-2 text-sm text-amber-200">Crea tu cuenta</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
                 Nombre Completo
@@ -100,6 +100,7 @@ export default function RegisterPage() {
                 name="nombre"
                 value={formData.nombre}
                 onChange={handleChange}
+                autoComplete="off"
                 className="w-full rounded-lg border border-white/10 bg-slate-800 px-4 py-2.5 text-white placeholder:text-slate-500 focus:border-amber-300 focus:outline-none focus:ring-1 focus:ring-amber-300/50"
               />
             </div>
@@ -113,6 +114,7 @@ export default function RegisterPage() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
+                autoComplete="off"
                 className="w-full rounded-lg border border-white/10 bg-slate-800 px-4 py-2.5 text-white placeholder:text-slate-500 focus:border-amber-300 focus:outline-none focus:ring-1 focus:ring-amber-300/50"
               />
             </div>
@@ -126,6 +128,7 @@ export default function RegisterPage() {
                 name="telefono"
                 value={formData.telefono}
                 onChange={handleChange}
+                autoComplete="off"
                 className="w-full rounded-lg border border-white/10 bg-slate-800 px-4 py-2.5 text-white placeholder:text-slate-500 focus:border-amber-300 focus:outline-none focus:ring-1 focus:ring-amber-300/50"
               />
             </div>
@@ -140,6 +143,7 @@ export default function RegisterPage() {
                 value={formData.ciudad}
                 onChange={handleChange}
                 placeholder="Ej: Bogotá, Medellín"
+                autoComplete="off"
                 className="w-full rounded-lg border border-white/10 bg-slate-800 px-4 py-2.5 text-white placeholder:text-slate-500 focus:border-amber-300 focus:outline-none focus:ring-1 focus:ring-amber-300/50"
                 required
               />
@@ -155,6 +159,7 @@ export default function RegisterPage() {
                 value={formData.direccionEntrega}
                 onChange={handleChange}
                 placeholder="Ej: Calle 123 #45-67, Apto 8B"
+                autoComplete="off"
                 className="w-full rounded-lg border border-white/10 bg-slate-800 px-4 py-2.5 text-white placeholder:text-slate-500 focus:border-amber-300 focus:outline-none focus:ring-1 focus:ring-amber-300/50"
                 required
               />
@@ -169,6 +174,7 @@ export default function RegisterPage() {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
+                autoComplete="new-password"
                 className="w-full rounded-lg border border-white/10 bg-slate-800 px-4 py-2.5 text-white placeholder:text-slate-500 focus:border-amber-300 focus:outline-none focus:ring-1 focus:ring-amber-300/50"
               />
             </div>
@@ -182,6 +188,7 @@ export default function RegisterPage() {
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleChange}
+                autoComplete="new-password"
                 className="w-full rounded-lg border border-white/10 bg-slate-800 px-4 py-2.5 text-white placeholder:text-slate-500 focus:border-amber-300 focus:outline-none focus:ring-1 focus:ring-amber-300/50"
               />
             </div>
