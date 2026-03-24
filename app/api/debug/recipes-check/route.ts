@@ -14,9 +14,9 @@ try {
 // GET - Debug: Ver todas las recetas y sus valores
 export async function GET() {
   try {
-    const { data: recipes, error: recipesError } = await supabase
-      .from("product_recipes")
-      .select(`
+    const { data: recipes, error: recipesError } = await supabase.from(
+      "product_recipes",
+    ).select(`
         id,
         product_id,
         material_id,
@@ -28,7 +28,10 @@ export async function GET() {
       `);
 
     if (recipesError) {
-      return NextResponse.json({ error: recipesError.message }, { status: 500 });
+      return NextResponse.json(
+        { error: recipesError.message },
+        { status: 500 },
+      );
     }
 
     // Mapear para que sea más legible

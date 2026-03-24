@@ -92,7 +92,7 @@ ALTER TABLE order_items ENABLE ROW LEVEL SECURITY;
 DESC customers;
 
 -- Ver órdenes con customers
-SELECT o.id, o.order_number, o.customer_name, c.name, c.email 
-FROM orders o 
+SELECT o.id, o.order_number, o.customer_name, c.name, c.email
+FROM orders o
 LEFT JOIN customers c ON o.customer_id = c.id;
 ```

@@ -5,6 +5,7 @@
 Se ha implementado un **sistema completo de gestión de pedidos y clientes** con descuentos automáticos de productos. El sistema incluye:
 
 ### 1. **Gestión de Clientes** ✅
+
 - **Tabla de clientes en Supabase** - Almacena toda la información de clientes
 - **Página de Clientes** (`/admin/clientes`) - Interfaz para:
   - Ver todos los clientes registrados y manuales
@@ -15,6 +16,7 @@ Se ha implementado un **sistema completo de gestión de pedidos y clientes** con
   - Ver historial y detalles de cada cliente
 
 ### 2. **Gestión de Pedidos Mejorada** ✅
+
 - **Página de Pedidos** (`/admin/pedidos`) - Interfaz mejorada con:
   - **Búsqueda de clientes** - Autocomplete mientras escribes el nombre
   - **Selección de cliente** - Al seleccionar, autocarga: nombre, email, teléfono
@@ -23,7 +25,9 @@ Se ha implementado un **sistema completo de gestión de pedidos y clientes** con
   - **Confirmación automática** - Al confirmar, descuenta productos del inventario
 
 ### 3. **Descuento Automático de Productos** ✅
+
 Cuando se **confirma un pedido**:
+
 - El sistema obtiene todos los items del pedido
 - Descuenta la cantidad de cada producto del inventario
 - Registra un movimiento de inventario automático
@@ -32,6 +36,7 @@ Cuando se **confirma un pedido**:
 ### 4. **Estructura de Base de Datos** ✅
 
 #### Tabla `customers` - Información de clientes
+
 ```
 ✓ id (UUID)
 ✓ name (VARCHAR) - Nombre requerido
@@ -47,6 +52,7 @@ Cuando se **confirma un pedido**:
 ```
 
 #### Tabla `orders` - Modificada
+
 ```
 ✓ customer_id (UUID FK) - Referencia a customer
 ✓ customer_name, email, phone - Información duplicada para auditoría
@@ -58,12 +64,15 @@ Cuando se **confirma un pedido**:
 ## 🚀 Pasos de Implementación en Supabase
 
 ### 1. Ejecutar Script SQL
+
 Ve a tu **Supabase SQL Editor** y ejecuta el contenido de:
+
 ```
 SETUP_CLIENTES_PEDIDOS.md
 ```
 
 Este script crea:
+
 - ✓ Tabla `customers`
 - ✓ Índices de búsqueda rápida
 - ✓ Políticas de acceso (RLS)
@@ -71,7 +80,9 @@ Este script crea:
 - ✓ Verifica otras tablas necesarias
 
 ### 2. Esperar a que Supabase aplique los cambios
+
 Los cambios se aplican inmediatamente. Puedes verificar:
+
 ```sql
 SELECT * FROM customers LIMIT 1;
 SELECT * FROM orders LIMIT 1; -- Verifica que exista customer_id
@@ -82,6 +93,7 @@ SELECT * FROM orders LIMIT 1; -- Verifica que exista customer_id
 ## 📖 Cómo Usar el Sistema
 
 ### **Gestión de Clientes**
+
 1. Ve a `/admin/clientes`
 2. **Agregar cliente**: Click "+ Agregar Cliente"
    - Completa datos básicos
@@ -93,6 +105,7 @@ SELECT * FROM orders LIMIT 1; -- Verifica que exista customer_id
 4. **Buscar cliente**: Escribe en el campo de búsqueda
 
 ### **Crear Pedido Ligado a Cliente**
+
 1. Ve a `/admin/pedidos`
 2. Click "+ Nuevo Pedido"
 3. **Campo búsqueda**: Empieza a escribir nombre del cliente
@@ -102,6 +115,7 @@ SELECT * FROM orders LIMIT 1; -- Verifica que exista customer_id
 7. Click "Crear Pedido"
 
 ### **Agregar Productos al Pedido**
+
 1. Selecciona el pedido de la lista
 2. Click "Agregar Item"
 3. Selecciona producto, cantidad y precio
@@ -109,6 +123,7 @@ SELECT * FROM orders LIMIT 1; -- Verifica que exista customer_id
 5. Repite para más productos
 
 ### **Confirmar Pedido (Descuento Automático)**
+
 1. Con el pedido en estado "pending"
 2. Click "Confirmar Pedido (Descontar Inventario)"
 3. **Automáticamente:**
@@ -118,7 +133,9 @@ SELECT * FROM orders LIMIT 1; -- Verifica que exista customer_id
    - Muestra éxito en mensajes
 
 ### **Ver Movimientos**
+
 Ve a `/admin/inventario` para ver:
+
 - ✓ Todos los movimientos
 - ✓ Descuentos automáticos por órdenes
 - ✓ Número de orden como referencia
@@ -158,11 +175,13 @@ Ve a `/admin/inventario` para ver:
 ## ✨ Características Destacadas
 
 ### **1. Búsqueda Inteligente**
+
 - Escribe nombre y ve sugerencias en vivo
 - Autocomplete con datos del cliente
 - Soporta búsqueda por nombre, email, teléfono
 
 ### **2. Descuento Automático**
+
 ```
 Al confirmar pedido:
 1. Si pedido tiene 2 manillas
@@ -172,11 +191,13 @@ Al confirmar pedido:
 ```
 
 ### **3. Campos Opcionales**
+
 - Email, teléfono, dirección, ciudad: todos opcionales
 - Permet crear clientes con solo nombre
 - Luego editar para agregar más información
 
 ### **4. Vinculación Cliente-Pedido**
+
 - Cada pedido está vinculado a un `customer_id`
 - Si no se selecciona cliente, se usa `customer_id = NULL`
 - Datos del cliente se copian a `orders` para auditoría
@@ -205,16 +226,16 @@ Para verificar que todo funciona:
 SELECT * FROM customers;
 
 -- Ver órdenes con clientes
-SELECT 
-  o.order_number, 
-  o.customer_name, 
+SELECT
+  o.order_number,
+  o.customer_name,
   c.name AS nombre_en_bd,
   o.status
 FROM orders o
 LEFT JOIN customers c ON o.customer_id = c.id;
 
 -- Ver movimientos de órdenes
-SELECT * FROM inventory_movements 
+SELECT * FROM inventory_movements
 WHERE reason LIKE '%Orden confirmada%'
 ORDER BY created_at DESC LIMIT 10;
 ```

@@ -14,7 +14,7 @@ try {
 // GET - Obtener cliente por ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
@@ -29,7 +29,7 @@ export async function GET(
       console.error("Error fetching customer:", error);
       return NextResponse.json(
         { error: "Customer not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -38,7 +38,7 @@ export async function GET(
     console.error("Error in GET /api/customers/[id]:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -46,27 +46,18 @@ export async function GET(
 // PUT - Actualizar cliente
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
     const body = await request.json();
-    const {
-      name,
-      email,
-      phone,
-      address,
-      city,
-      state,
-      zip_code,
-      notes,
-    } = body;
+    const { name, email, phone, address, city, state, zip_code, notes } = body;
 
     // Validación básica
     if (name === "") {
       return NextResponse.json(
         { error: "Customer name cannot be empty" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -91,7 +82,10 @@ export async function PUT(
 
     if (error || !data) {
       console.error("Error updating customer:", error);
-      return NextResponse.json({ error: error?.message || "Update failed" }, { status: 500 });
+      return NextResponse.json(
+        { error: error?.message || "Update failed" },
+        { status: 500 },
+      );
     }
 
     return NextResponse.json(data);
@@ -99,7 +93,7 @@ export async function PUT(
     console.error("Error in PUT /api/customers/[id]:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -107,7 +101,7 @@ export async function PUT(
 // DELETE - Eliminar cliente
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
@@ -122,14 +116,11 @@ export async function DELETE(
     if (orders && orders.length > 0) {
       return NextResponse.json(
         { error: "Cannot delete customer with existing orders" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    const { error } = await supabase
-      .from("customers")
-      .delete()
-      .eq("id", id);
+    const { error } = await supabase.from("customers").delete().eq("id", id);
 
     if (error) {
       console.error("Error deleting customer:", error);
@@ -141,7 +132,7 @@ export async function DELETE(
     console.error("Error in DELETE /api/customers/[id]:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

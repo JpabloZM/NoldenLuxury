@@ -33,8 +33,8 @@ export async function POST(request: NextRequest) {
       materials_used: materials_used.map((m: any) => ({
         name: m.material_name,
         per_unit: m.quantity_used,
-        total: m.quantity_used * quantity_produced
-      }))
+        total: m.quantity_used * quantity_produced,
+      })),
     });
 
     // Por cada material usado: descontar y registrar movimiento

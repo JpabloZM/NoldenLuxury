@@ -25,6 +25,12 @@ import {
 } from "@/app/lib/customers-operations";
 import { fetchProducts } from "@/app/lib/product-operations";
 
+interface TempOrderItem extends OrderItemForm {
+  id: string;
+  product_name: string;
+  subtotal: number;
+}
+
 export default function PedidosPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [products, setProducts] = useState<ProductWithInventory[]>([]);
@@ -38,7 +44,10 @@ export default function PedidosPage() {
   const [customerSearch, setCustomerSearch] = useState("");
   const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
   const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
+    null,
+  );
+  const [tempOrderItems, setTempOrderItems] = useState<TempOrderItem[]>([]);
 
   const [newOrderData, setNewOrderData] = useState<OrderForm>({
     customer_name: "",
@@ -61,7 +70,7 @@ export default function PedidosPage() {
     // Filtrar clientes mientras el usuario escribe
     if (customerSearch.length > 0) {
       const filtered = customers.filter((c) =>
-        c.name.toLowerCase().includes(customerSearch.toLowerCase())
+        c.name.toLowerCase().includes(customerSearch.toLowerCase()),
       );
       setFilteredCustomers(filtered);
       setShowCustomerDropdown(true);
@@ -70,6 +79,21 @@ export default function PedidosPage() {
       setShowCustomerDropdown(false);
     }
   }, [customerSearch, customers]);
+
+  // Auto-poblar precio cuando se selecciona un producto
+  useEffect(() => {
+    if (newItemData.product_id) {
+      const selectedProduct = products.find(
+        (p) => p.id === newItemData.product_id,
+      );
+      if (selectedProduct) {
+        setNewItemData({
+          ...newItemData,
+          unit_price: selectedProduct.price,
+        });
+      }
+    }
+  }, [newItemData.product_id, products]);
 
   const loadData = async () => {
     try {
@@ -106,6 +130,45 @@ export default function PedidosPage() {
     });
   };
 
+  const calcularTotal = (): number => {
+    return tempOrderItems.reduce((sum, item) => sum + item.subtotal, 0);
+  };
+
+  const handleAddItemToTemp = () => {
+    if (!newItemData.product_id) {
+      setError("Selecciona un producto");
+      return;
+    }
+
+    const selectedProduct = products.find(
+      (p) => p.id === newItemData.product_id,
+    );
+    if (!selectedProduct) {
+      setError("Producto no encontrado");
+      return;
+    }
+
+    const subtotal = newItemData.quantity * newItemData.unit_price;
+    const tempItem: TempOrderItem = {
+      id: `temp-${Date.now()}`,
+      product_id: newItemData.product_id,
+      product_name: selectedProduct.name,
+      quantity: newItemData.quantity,
+      unit_price: newItemData.unit_price,
+      subtotal,
+    };
+
+    setTempOrderItems([...tempOrderItems, tempItem]);
+    setNewItemData({ product_id: "", quantity: 1, unit_price: 0 });
+    setError(null);
+  };
+
+  const handleRemoveItemFromTemp = (tempId: string) => {
+    setTempOrderItems(
+      tempOrderItems.filter((item) => item.id !== tempId),
+    );
+  };
+
   const handleCreateOrder = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -114,20 +177,37 @@ export default function PedidosPage() {
       return;
     }
 
+    if (tempOrderItems.length === 0) {
+      setError("Agrega al menos un producto al pedido");
+      return;
+    }
+
     try {
       setError(null);
       const createdOrder = await createOrder(newOrderData);
+
+      // Crear items para la orden
+      for (const item of tempOrderItems) {
+        await addOrderItem(createdOrder.id, {
+          product_id: item.product_id,
+          quantity: item.quantity,
+          unit_price: item.unit_price,
+        });
+      }
+
       setOrders([createdOrder, ...orders]);
-      setSuccessMessage("Pedido creado exitosamente");
+      setSuccessMessage("Pedido creado exitosamente con productos");
       setShowNewOrderForm(false);
       setSelectedCustomer(null);
       setCustomerSearch("");
+      setTempOrderItems([]);
       setNewOrderData({
         customer_name: "",
         customer_email: "",
         customer_phone: "",
         notes: "",
       });
+      setNewItemData({ product_id: "", quantity: 1, unit_price: 0 });
 
       setTimeout(() => setSuccessMessage(null), 3000);
       await loadData();
@@ -177,7 +257,7 @@ export default function PedidosPage() {
       setError(null);
       await updateOrderStatus(selectedOrder.id, "confirmed");
       setSuccessMessage(
-        "Pedido confirmado - Productos descontados automáticamente"
+        "Pedido confirmado - Productos descontados automáticamente",
       );
 
       // Recargar
@@ -300,147 +380,311 @@ export default function PedidosPage() {
         {/* Formulario */}
         {showNewOrderForm && (
           <div className="bg-slate-800 p-6 rounded-lg border border-slate-700">
-            <h2 className="text-lg font-semibold text-amber-300 mb-4">
-              Crear Nuevo Pedido
+            <h2 className="text-lg font-semibold text-amber-300 mb-6">
+              Crear Nuevo Pedido - Opción A (Con Productos)
             </h2>
-            <form onSubmit={handleCreateOrder} className="space-y-4">
-              {/* Búsqueda de Cliente */}
-              <div className="relative">
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Seleccionar Cliente (Escribe para buscar)
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={customerSearch}
-                    onChange={(e) => setCustomerSearch(e.target.value)}
-                    placeholder="Busca por nombre de cliente..."
-                    className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
-                  />
-                  {selectedCustomer && (
-                    <div className="mt-2 p-3 bg-slate-700 rounded border border-emerald-500/50">
-                      <p className="text-sm text-emerald-300 font-semibold">
-                        ✓ {selectedCustomer.name}
-                      </p>
-                      {selectedCustomer.email && (
-                        <p className="text-xs text-slate-400">
-                          {selectedCustomer.email}
+            <form onSubmit={handleCreateOrder} className="space-y-6">
+              {/* SECCIÓN 1: Datos del Cliente */}
+              <div className="border-b border-slate-600 pb-6">
+                <h3 className="text-md font-semibold text-cyan-300 mb-4">
+                  1. Información del Cliente
+                </h3>
+                {/* Búsqueda de Cliente */}
+                <div className="relative mb-4">
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    Seleccionar Cliente (Escribe para buscar)
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={customerSearch}
+                      onChange={(e) => setCustomerSearch(e.target.value)}
+                      placeholder="Busca por nombre de cliente..."
+                      className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                    />
+                    {selectedCustomer && (
+                      <div className="mt-2 p-3 bg-slate-700 rounded border border-emerald-500/50">
+                        <p className="text-sm text-emerald-300 font-semibold">
+                          ✓ {selectedCustomer.name}
                         </p>
-                      )}
-                      {selectedCustomer.phone && (
-                        <p className="text-xs text-slate-400">
-                          {selectedCustomer.phone}
-                        </p>
-                      )}
+                        {selectedCustomer.email && (
+                          <p className="text-xs text-slate-400">
+                            {selectedCustomer.email}
+                          </p>
+                        )}
+                        {selectedCustomer.phone && (
+                          <p className="text-xs text-slate-400">
+                            {selectedCustomer.phone}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                    {showCustomerDropdown && filteredCustomers.length > 0 && (
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-slate-700 border border-slate-600 rounded shadow-lg z-10 max-h-40 overflow-y-auto">
+                        {filteredCustomers.map((customer) => (
+                          <button
+                            key={customer.id}
+                            type="button"
+                            onClick={() => handleSelectCustomer(customer)}
+                            className="w-full text-left px-3 py-2 hover:bg-slate-600 text-white text-sm border-b border-slate-600 last:border-b-0"
+                          >
+                            <p className="font-medium">{customer.name}</p>
+                            {customer.email && (
+                              <p className="text-xs text-slate-400">
+                                {customer.email}
+                              </p>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Datos de Cliente */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                      Nombre del Cliente *
+                    </label>
+                    <input
+                      type="text"
+                      value={newOrderData.customer_name}
+                      onChange={(e) =>
+                        setNewOrderData({
+                          ...newOrderData,
+                          customer_name: e.target.value,
+                        })
+                      }
+                      placeholder="Nombre..."
+                      className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      value={newOrderData.customer_email || ""}
+                      onChange={(e) =>
+                        setNewOrderData({
+                          ...newOrderData,
+                          customer_email: e.target.value,
+                        })
+                      }
+                      placeholder="Email..."
+                      className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                      Teléfono
+                    </label>
+                    <input
+                      type="tel"
+                      value={newOrderData.customer_phone || ""}
+                      onChange={(e) =>
+                        setNewOrderData({
+                          ...newOrderData,
+                          customer_phone: e.target.value,
+                        })
+                      }
+                      placeholder="Teléfono..."
+                      className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                      Notas
+                    </label>
+                    <input
+                      type="text"
+                      value={newOrderData.notes || ""}
+                      onChange={(e) =>
+                        setNewOrderData({
+                          ...newOrderData,
+                          notes: e.target.value,
+                        })
+                      }
+                      placeholder="Notas opcionales..."
+                      className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* SECCIÓN 2: Agregar Productos */}
+              <div className="border-b border-slate-600 pb-6">
+                <h3 className="text-md font-semibold text-cyan-300 mb-4">
+                  2. Agregar Productos al Pedido
+                </h3>
+                <div className="space-y-3 p-4 bg-slate-700 rounded">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-slate-400 mb-1">
+                        Producto
+                      </label>
+                      <select
+                        value={newItemData.product_id}
+                        onChange={(e) =>
+                          setNewItemData({
+                            ...newItemData,
+                            product_id: e.target.value,
+                          })
+                        }
+                        className="w-full bg-slate-600 border border-slate-500 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-400"
+                      >
+                        <option value="">Selecciona...</option>
+                        {products.map((p) => (
+                          <option key={p.id} value={p.id}>
+                            {p.name}
+                          </option>
+                        ))}
+                      </select>
                     </div>
-                  )}
-                  {showCustomerDropdown && filteredCustomers.length > 0 && (
-                    <div className="absolute top-full left-0 right-0 mt-1 bg-slate-700 border border-slate-600 rounded shadow-lg z-10 max-h-40 overflow-y-auto">
-                      {filteredCustomers.map((customer) => (
+
+                    <div>
+                      <label className="block text-xs font-medium text-slate-400 mb-1">
+                        Cantidad
+                      </label>
+                      <input
+                        type="number"
+                        step="1"
+                        min="1"
+                        value={newItemData.quantity || ""}
+                        onChange={(e) =>
+                          setNewItemData({
+                            ...newItemData,
+                            quantity:
+                              e.target.value === ""
+                                ? 0
+                                : Math.floor(parseInt(e.target.value, 10)) || 1,
+                          })
+                        }
+                        className="w-full bg-slate-600 border border-slate-500 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-400"
+                        placeholder="Cant."
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium text-slate-400 mb-1">
+                        Precio Unit. (Auto)
+                      </label>
+                      <input
+                        type="number"
+                        value={newItemData.unit_price || ""}
+                        onChange={(e) =>
+                          setNewItemData({
+                            ...newItemData,
+                            unit_price:
+                              e.target.value === ""
+                                ? 0
+                                : parseFloat(e.target.value) || 0,
+                          })
+                        }
+                        className="w-full bg-slate-600 border border-slate-500 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-400"
+                        placeholder="Precio"
+                        step="0.01"
+                      />
+                    </div>
+
+                    <div className="flex items-end">
+                      <button
+                        type="button"
+                        onClick={handleAddItemToTemp}
+                        className="w-full bg-blue-600 text-white px-3 py-2 rounded text-sm font-semibold hover:bg-blue-700 transition"
+                      >
+                        + Agregar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* SECCIÓN 3: Productos Agregados */}
+              <div className="border-b border-slate-600 pb-6">
+                <h3 className="text-md font-semibold text-cyan-300 mb-4">
+                  3. Productos en el Pedido ({tempOrderItems.length})
+                </h3>
+                {tempOrderItems.length === 0 ? (
+                  <p className="text-slate-400 italic text-sm p-4 bg-slate-700 rounded">
+                    No hay productos agregados aún
+                  </p>
+                ) : (
+                  <div className="space-y-2">
+                    {tempOrderItems.map((item) => (
+                      <div
+                        key={item.id}
+                        className="p-3 bg-slate-700 rounded border border-slate-600 flex justify-between items-center"
+                      >
+                        <div className="flex-1">
+                          <p className="font-semibold text-white">
+                            {item.product_name}
+                          </p>
+                          <p className="text-sm text-slate-400">
+                            {item.quantity} × ${item.unit_price.toFixed(2)} = 
+                            <span className="text-amber-300 font-semibold ml-1">
+                              ${item.subtotal.toFixed(2)}
+                            </span>
+                          </p>
+                        </div>
                         <button
-                          key={customer.id}
                           type="button"
-                          onClick={() => handleSelectCustomer(customer)}
-                          className="w-full text-left px-3 py-2 hover:bg-slate-600 text-white text-sm border-b border-slate-600 last:border-b-0"
+                          onClick={() => handleRemoveItemFromTemp(item.id)}
+                          className="bg-red-600 text-white px-3 py-1 rounded text-xs hover:bg-red-700 transition font-semibold"
                         >
-                          <p className="font-medium">{customer.name}</p>
-                          {customer.email && (
-                            <p className="text-xs text-slate-400">
-                              {customer.email}
-                            </p>
-                          )}
+                          Quitar
                         </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
-              {/* Datos de Cliente */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Nombre del Cliente *
-                  </label>
-                  <input
-                    type="text"
-                    value={newOrderData.customer_name}
-                    onChange={(e) =>
-                      setNewOrderData({
-                        ...newOrderData,
-                        customer_name: e.target.value,
-                      })
-                    }
-                    placeholder="Nombre..."
-                    className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
-                  />
+              {/* SECCIÓN 4: Resumen y Total */}
+              {tempOrderItems.length > 0 && (
+                <div className="bg-slate-700 p-4 rounded border border-amber-500/50">
+                  <div className="flex justify-between items-center">
+                    <p className="text-lg font-bold text-white">Total del Pedido:</p>
+                    <p className="text-3xl font-bold text-amber-300">
+                      ${calcularTotal().toFixed(2)}
+                    </p>
+                  </div>
                 </div>
+              )}
 
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    value={newOrderData.customer_email || ""}
-                    onChange={(e) =>
-                      setNewOrderData({
-                        ...newOrderData,
-                        customer_email: e.target.value,
-                      })
-                    }
-                    placeholder="Email..."
-                    className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Teléfono
-                  </label>
-                  <input
-                    type="tel"
-                    value={newOrderData.customer_phone || ""}
-                    onChange={(e) =>
-                      setNewOrderData({
-                        ...newOrderData,
-                        customer_phone: e.target.value,
-                      })
-                    }
-                    placeholder="Teléfono..."
-                    className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Notas
-                  </label>
-                  <input
-                    type="text"
-                    value={newOrderData.notes || ""}
-                    onChange={(e) =>
-                      setNewOrderData({
-                        ...newOrderData,
-                        notes: e.target.value,
-                      })
-                    }
-                    placeholder="Notas opcionales..."
-                    className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
-                  />
-                </div>
-              </div>
-
-              <div className="md:col-span-2 flex gap-2 pt-4">
+              {/* Botones de Acción */}
+              <div className="flex gap-2 pt-4">
                 <button
                   type="submit"
-                  className="flex-1 bg-emerald-600 text-white px-4 py-2.5 rounded font-semibold hover:bg-emerald-700 transition"
+                  disabled={tempOrderItems.length === 0}
+                  className={`flex-1 px-4 py-2.5 rounded font-semibold transition ${
+                    tempOrderItems.length === 0
+                      ? "bg-emerald-600/50 text-slate-300 cursor-not-allowed"
+                      : "bg-emerald-600 text-white hover:bg-emerald-700"
+                  }`}
                 >
-                  Crear Pedido
+                  ✓ Crear Pedido ({tempOrderItems.length} productos)
                 </button>
                 <button
                   type="button"
-                  onClick={() => setShowNewOrderForm(false)}
+                  onClick={() => {
+                    setShowNewOrderForm(false);
+                    setSelectedCustomer(null);
+                    setCustomerSearch("");
+                    setTempOrderItems([]);
+                    setNewOrderData({
+                      customer_name: "",
+                      customer_email: "",
+                      customer_phone: "",
+                      notes: "",
+                    });
+                    setNewItemData({ product_id: "", quantity: 1, unit_price: 0 });
+                  }}
                   className="flex-1 bg-slate-700 text-white px-4 py-2.5 rounded font-semibold hover:bg-slate-600 transition"
                 >
                   Cancelar

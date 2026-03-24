@@ -120,9 +120,9 @@ export async function updateOrderStatus(
   const response = await fetch(`/api/orders/${orderId}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ 
+    body: JSON.stringify({
       status,
-      confirm: status === "confirmed" // Descontar productos si se confirma
+      confirm: status === "confirmed", // Descontar productos si se confirma
     }),
   });
 

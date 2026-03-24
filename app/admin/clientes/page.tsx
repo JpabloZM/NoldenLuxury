@@ -14,7 +14,9 @@ import {
 export default function ClientesPage() {
   const router = useRouter();
   const [customers, setCustomers] = useState<Customer[]>([]);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
+    null,
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -96,7 +98,7 @@ export default function ClientesPage() {
       setError(null);
       const updated = await updateCustomer(selectedCustomer.id, formData);
       setCustomers(
-        customers.map((c) => (c.id === selectedCustomer.id ? updated : c))
+        customers.map((c) => (c.id === selectedCustomer.id ? updated : c)),
       );
       setSelectedCustomer(updated);
       setSuccessMessage("Cliente actualizado exitosamente");
@@ -164,13 +166,16 @@ export default function ClientesPage() {
     }
   };
 
-  const filteredCustomers = customers.filter((c) =>
-    c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (c.email && c.email.toLowerCase().includes(searchQuery.toLowerCase())) ||
-    (c.phone && c.phone.includes(searchQuery))
+  const filteredCustomers = customers.filter(
+    (c) =>
+      c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (c.email && c.email.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (c.phone && c.phone.includes(searchQuery)),
   );
 
-  const registeredCount = customers.filter((c) => c.source === "registered").length;
+  const registeredCount = customers.filter(
+    (c) => c.source === "registered",
+  ).length;
   const manualCount = customers.filter((c) => c.source === "manual").length;
 
   if (isLoading) {
@@ -187,7 +192,9 @@ export default function ClientesPage() {
     <AdminLayout>
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-4xl font-bold text-amber-300">Gestión de Clientes</h1>
+          <h1 className="text-4xl font-bold text-amber-300">
+            Gestión de Clientes
+          </h1>
           <button
             onClick={() => {
               setShowForm(!showForm);
@@ -473,7 +480,9 @@ export default function ClientesPage() {
                           Editar
                         </button>
                         <button
-                          onClick={() => handleDeleteCustomer(selectedCustomer.id)}
+                          onClick={() =>
+                            handleDeleteCustomer(selectedCustomer.id)
+                          }
                           className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition"
                         >
                           Eliminar
@@ -548,15 +557,12 @@ export default function ClientesPage() {
                     <div className="mt-6 text-xs text-slate-500">
                       Creado:{" "}
                       {new Date(selectedCustomer.created_at).toLocaleDateString(
-                        "es-ES"
+                        "es-ES",
                       )}
                     </div>
                   </>
                 ) : (
-                  <form
-                    onSubmit={handleUpdateCustomer}
-                    className="space-y-4"
-                  >
+                  <form onSubmit={handleUpdateCustomer} className="space-y-4">
                     <h3 className="text-lg font-semibold text-amber-300 mb-4">
                       Editar Cliente
                     </h3>

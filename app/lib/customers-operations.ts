@@ -41,9 +41,12 @@ export async function fetchCustomerById(id: string): Promise<Customer | null> {
 // Buscar clientes por nombre
 export async function searchCustomers(query: string): Promise<Customer[]> {
   try {
-    const response = await fetch(`/api/customers?search=${encodeURIComponent(query)}`, {
-      cache: "no-store",
-    });
+    const response = await fetch(
+      `/api/customers?search=${encodeURIComponent(query)}`,
+      {
+        cache: "no-store",
+      },
+    );
 
     if (!response.ok) {
       return [];
@@ -58,7 +61,7 @@ export async function searchCustomers(query: string): Promise<Customer[]> {
 
 // Crear cliente
 export async function createCustomer(
-  customer: CustomerForm
+  customer: CustomerForm,
 ): Promise<Customer> {
   const response = await fetch("/api/customers", {
     method: "POST",
@@ -77,7 +80,7 @@ export async function createCustomer(
 // Actualizar cliente
 export async function updateCustomer(
   id: string,
-  customer: Partial<CustomerForm>
+  customer: Partial<CustomerForm>,
 ): Promise<Customer> {
   const response = await fetch(`/api/customers/${id}`, {
     method: "PUT",

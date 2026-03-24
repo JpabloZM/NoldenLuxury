@@ -377,7 +377,9 @@ export default function ProductosPage() {
                       Materiales Por Unidad (Opcional)
                     </h3>
                     <span className="text-xs text-slate-400 bg-slate-700 px-2 py-1 rounded">
-                      Especifica la cantidad de materiales para 1 {formData.name || "unidad"}. El sistema multiplicará por la cantidad total a crear.
+                      Especifica la cantidad de materiales para 1{" "}
+                      {formData.name || "unidad"}. El sistema multiplicará por
+                      la cantidad total a crear.
                     </span>
                   </div>
 
@@ -396,7 +398,11 @@ export default function ProductosPage() {
                               {mat.quantity_used} {mat.unit} por unidad
                             </p>
                             <p className="text-xs text-slate-400">
-                              Total: {(mat.quantity_used * formData.inventory).toFixed(1)} {mat.unit} (para {formData.inventory} unidades)
+                              Total:{" "}
+                              {(mat.quantity_used * formData.inventory).toFixed(
+                                1,
+                              )}{" "}
+                              {mat.unit} (para {formData.inventory} unidades)
                             </p>
                           </div>
                           <button

@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     if (!customer_name) {
       return NextResponse.json(
         { error: "Customer name is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
     console.error("Error in POST /api/orders:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
