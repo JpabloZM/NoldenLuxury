@@ -14,10 +14,10 @@ try {
 // GET - Obtener cliente por ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const { data, error } = await supabase
       .from("customers")
@@ -46,10 +46,10 @@ export async function GET(
 // PUT - Actualizar cliente
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     const {
       name,
@@ -107,10 +107,10 @@ export async function PUT(
 // DELETE - Eliminar cliente
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     // Verificar si el cliente tiene órdenes
     const { data: orders } = await supabase
