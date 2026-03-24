@@ -404,7 +404,7 @@ export default function InventoryPage() {
           <h2 className="text-lg font-semibold text-amber-300 mb-4">
             Movimientos Recientes
           </h2>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto max-h-96 overflow-y-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-700">
