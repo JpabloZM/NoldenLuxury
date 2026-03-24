@@ -534,7 +534,7 @@ export default function InventoryPage() {
           </div>
 
           {/* Table */}
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto max-h-96 overflow-y-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-700">
