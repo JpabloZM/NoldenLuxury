@@ -98,7 +98,8 @@ export async function POST(request: NextRequest) {
       }
 
       // Crear receta (product_recipe) - quantity_needed es la cantidad POR UNIDAD
-      const quantity_per_unit = quantity_used / quantity_produced;
+      // quantity_used YA es por unidad (no necesita división)
+      const quantity_per_unit = quantity_used;
       const { error: recipeError } = await supabase
         .from("product_recipes")
         .upsert({
