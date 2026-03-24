@@ -13,7 +13,9 @@ export default function RegisterPage() {
     password: "",
     confirmPassword: "",
     telefono: "",
+    departamento: "",
     ciudad: "",
+    codigoPostal: "",
     direccionEntrega: "",
   });
   const [error, setError] = useState("");
@@ -67,9 +69,10 @@ export default function RegisterPage() {
         email: formData.email,
         password: formData.password, // En producción: hashear
         telefono: formData.telefono,
+        departamento: formData.departamento,
         ciudad: formData.ciudad,
+        codigoPostal: formData.codigoPostal,
         direccionEntrega: formData.direccionEntrega,
-        codigoPostal: "",
         createdAt: new Date().toISOString(),
       };
 
@@ -84,13 +87,16 @@ export default function RegisterPage() {
           phone: formData.telefono,
           address: formData.direccionEntrega,
           city: formData.ciudad,
-          state: "",
-          zip_code: "",
+          state: formData.departamento,
+          zip_code: formData.codigoPostal,
           notes: "",
           source: "registered",
         });
       } catch (supabaseError) {
-        console.warn("Cliente guardado localmente pero no en Supabase:", supabaseError);
+        console.warn(
+          "Cliente guardado localmente pero no en Supabase:",
+          supabaseError,
+        );
         // No bloqueamos el registro si falla Supabase
       }
 
@@ -164,6 +170,22 @@ export default function RegisterPage() {
 
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
+                Departamento/Estado
+              </label>
+              <input
+                type="text"
+                name="departamento"
+                value={formData.departamento}
+                onChange={handleChange}
+                placeholder="Ej: Cundinamarca, Antioquia"
+                autoComplete="off"
+                className="w-full rounded-lg border border-white/10 bg-slate-800 px-4 py-2.5 text-white placeholder:text-slate-500 focus:border-amber-300 focus:outline-none focus:ring-1 focus:ring-amber-300/50"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">
                 Ciudad
               </label>
               <input
@@ -172,6 +194,22 @@ export default function RegisterPage() {
                 value={formData.ciudad}
                 onChange={handleChange}
                 placeholder="Ej: Bogotá, Medellín"
+                autoComplete="off"
+                className="w-full rounded-lg border border-white/10 bg-slate-800 px-4 py-2.5 text-white placeholder:text-slate-500 focus:border-amber-300 focus:outline-none focus:ring-1 focus:ring-amber-300/50"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                Código Postal
+              </label>
+              <input
+                type="text"
+                name="codigoPostal"
+                value={formData.codigoPostal}
+                onChange={handleChange}
+                placeholder="Ej: 110111"
                 autoComplete="off"
                 className="w-full rounded-lg border border-white/10 bg-slate-800 px-4 py-2.5 text-white placeholder:text-slate-500 focus:border-amber-300 focus:outline-none focus:ring-1 focus:ring-amber-300/50"
                 required
