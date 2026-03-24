@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { products } from "../lib/products";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import LoginCarritoModal from "@/app/components/LoginCarritoModal";
 import Toast from "@/app/components/Toast";
 import Header from "@/app/components/Header";
 import { agregarAlCarrito } from "@/app/lib/carrito-utils";
+import { fetchProducts } from "@/app/lib/product-operations";
 
 type CategoryFilter =
   | "Todos"
@@ -18,15 +18,42 @@ type CategoryFilter =
   | "Tobilleras"
   | "Dijes";
 
+interface Product {
+  id: string;
+  name: string;
+  category: string;
+  material: string;
+  price: number;
+  image: string;
+}
+
 export default function CatalogoPage() {
+  const [products, setProducts] = useState<Product[]>([]);
   const [filter, setFilter] = useState<CategoryFilter>("Todos");
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "error" | "info";
   } | null>(null);
   const clienteToken =
     typeof window !== "undefined" ? localStorage.getItem("clienteToken") : null;
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setIsLoading(true);
+        const data = await fetchProducts();
+        setProducts(data);
+      } catch (err) {
+        console.error("Error cargando productos:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadProducts();
+  }, []);
 
   const filteredProducts =
     filter === "Todos"
@@ -112,7 +139,16 @@ export default function CatalogoPage() {
         </div>
 
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {filteredProducts.map((product) => (
+          {isLoading ? (
+            <div className="col-span-full text-center py-12">
+              <p className="text-slate-400">Cargando productos...</p>
+            </div>
+          ) : filteredProducts.length === 0 ? (
+            <div className="col-span-full text-center py-12">
+              <p className="text-slate-400">No hay productos disponibles</p>
+            </div>
+          ) : (
+            filteredProducts.map((product) => (
             <article
               key={product.id}
               className="group relative flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-900/70"
@@ -154,16 +190,9 @@ export default function CatalogoPage() {
                 </div>
               </div>
             </article>
-          ))}
+            ))
+          )}
         </div>
-
-        {filteredProducts.length === 0 && (
-          <div className="py-12 text-center">
-            <p className="text-slate-400">
-              No hay productos disponibles en esta categoría.
-            </p>
-          </div>
-        )}
       </div>
 
       {showLoginModal && (
