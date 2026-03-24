@@ -11,92 +11,87 @@ try {
   console.error("Failed to create Supabase client:", err);
 }
 
-// Helper para generar número de orden
-function generateOrderNumber(): string {
-  const date = new Date();
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const random = Math.floor(Math.random() * 10000)
-    .toString()
-    .padStart(4, "0");
-  return `ORD-${year}${month}${day}-${random}`;
-}
-
-// GET - Obtener todas las órdenes
+// GET - Obtener todos los clientes o buscar
 export async function GET(request: NextRequest) {
   try {
-    const { data, error } = await supabase
-      .from("orders")
+    const { searchParams } = new URL(request.url);
+    const search = searchParams.get("search");
+
+    let query = supabase
+      .from("customers")
       .select("*")
       .order("created_at", { ascending: false });
 
+    if (search) {
+      query = query.or(
+        `name.ilike.%${search}%,email.ilike.%${search}%,phone.ilike.%${search}%`
+      );
+    }
+
+    const { data, error } = await query;
+
     if (error) {
-      console.error("Error fetching orders:", error);
+      console.error("Error fetching customers:", error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
     return NextResponse.json(data || []);
   } catch (error) {
-    console.error("Error in GET /api/orders:", error);
+    console.error("Error in GET /api/customers:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
 
-// POST - Crear nueva orden
+// POST - Crear nuevo cliente
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const {
-      customer_id,
-      customer_name,
-      customer_email,
-      customer_phone,
-      status = "pending",
+      name,
+      email,
+      phone,
+      address,
+      city,
+      state,
+      zip_code,
       notes,
+      source = "manual",
     } = body;
 
-    if (!customer_name) {
+    if (!name) {
       return NextResponse.json(
         { error: "Customer name is required" },
         { status: 400 }
       );
     }
 
-    const order_number = generateOrderNumber();
-
     const { data, error } = await supabase
-      .from("orders")
+      .from("customers")
       .insert({
-        order_number,
-        customer_id: customer_id || null,
-        customer_name,
-        customer_email: customer_email || null,
-        customer_phone: customer_phone || null,
-        status,
+        name,
+        email: email || null,
+        phone: phone || null,
+        address: address || null,
+        city: city || null,
+        state: state || null,
+        zip_code: zip_code || null,
         notes: notes || null,
+        source,
       })
       .select()
       .single();
 
     if (error) {
-      console.error("Error creating order:", error);
+      console.error("Error creating customer:", error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    // Registrar movimiento de orden
-    await supabase.from("order_movements").insert({
-      order_id: data.id,
-      status,
-      reason: "Orden creada",
-    });
-
     return NextResponse.json(data);
   } catch (error) {
-    console.error("Error in POST /api/orders:", error);
+    console.error("Error in POST /api/customers:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

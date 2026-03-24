@@ -8,6 +8,7 @@ import type {
   OrderForm,
   OrderItemForm,
 } from "@/app/lib/orders-types";
+import type { Customer } from "@/app/lib/customers-types";
 import type { ProductWithInventory } from "@/app/lib/admin-types";
 import {
   fetchOrders,
@@ -17,17 +18,27 @@ import {
   addOrderItem,
   removeOrderItem,
 } from "@/app/lib/orders-operations";
+import {
+  fetchCustomers,
+  searchCustomers,
+  createCustomer as createNewCustomer,
+} from "@/app/lib/customers-operations";
 import { fetchProducts } from "@/app/lib/product-operations";
 
 export default function PedidosPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [products, setProducts] = useState<ProductWithInventory[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<OrderSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showNewOrderForm, setShowNewOrderForm] = useState(false);
   const [showAddItemForm, setShowAddItemForm] = useState(false);
+  const [customerSearch, setCustomerSearch] = useState("");
+  const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
+  const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
 
   const [newOrderData, setNewOrderData] = useState<OrderForm>({
     customer_name: "",
@@ -46,24 +57,53 @@ export default function PedidosPage() {
     loadData();
   }, []);
 
+  useEffect(() => {
+    // Filtrar clientes mientras el usuario escribe
+    if (customerSearch.length > 0) {
+      const filtered = customers.filter((c) =>
+        c.name.toLowerCase().includes(customerSearch.toLowerCase())
+      );
+      setFilteredCustomers(filtered);
+      setShowCustomerDropdown(true);
+    } else {
+      setFilteredCustomers([]);
+      setShowCustomerDropdown(false);
+    }
+  }, [customerSearch, customers]);
+
   const loadData = async () => {
     try {
       setIsLoading(true);
       setError(null);
 
-      const [ordersData, productsData] = await Promise.all([
+      const [ordersData, productsData, customersData] = await Promise.all([
         fetchOrders(),
         fetchProducts(),
+        fetchCustomers(),
       ]);
 
       setOrders(ordersData);
       setProducts(productsData);
+      setCustomers(customersData);
     } catch (err) {
       console.error("Error loading data:", err);
       setError(err instanceof Error ? err.message : "Error loading data");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleSelectCustomer = (customer: Customer) => {
+    setSelectedCustomer(customer);
+    setCustomerSearch("");
+    setShowCustomerDropdown(false);
+    setNewOrderData({
+      ...newOrderData,
+      customer_id: customer.id,
+      customer_name: customer.name,
+      customer_email: customer.email || "",
+      customer_phone: customer.phone || "",
+    });
   };
 
   const handleCreateOrder = async (e: React.FormEvent) => {
@@ -80,6 +120,8 @@ export default function PedidosPage() {
       setOrders([createdOrder, ...orders]);
       setSuccessMessage("Pedido creado exitosamente");
       setShowNewOrderForm(false);
+      setSelectedCustomer(null);
+      setCustomerSearch("");
       setNewOrderData({
         customer_name: "",
         customer_email: "",
@@ -107,7 +149,7 @@ export default function PedidosPage() {
     e.preventDefault();
 
     if (!selectedOrder || !newItemData.product_id) {
-      setError("Product is required");
+      setError("El producto es requerido");
       return;
     }
 
@@ -135,7 +177,7 @@ export default function PedidosPage() {
       setError(null);
       await updateOrderStatus(selectedOrder.id, "confirmed");
       setSuccessMessage(
-        "Pedido confirmado - Productos descontados automáticamente",
+        "Pedido confirmado - Productos descontados automáticamente"
       );
 
       // Recargar
@@ -193,116 +235,203 @@ export default function PedidosPage() {
     );
   }
 
+  const pendingOrders = orders.filter((o) => o.status === "pending");
+  const totalOrders = orders.length;
+
   return (
     <AdminLayout>
-      <div className="space-y-6 p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-amber-300">Pedidos</h1>
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-4xl font-bold text-amber-300">Pedidos</h1>
           <button
-            onClick={() => setShowNewOrderForm(!showNewOrderForm)}
+            onClick={() => {
+              setShowNewOrderForm(!showNewOrderForm);
+              if (!showNewOrderForm) {
+                setSelectedCustomer(null);
+                setCustomerSearch("");
+                setNewOrderData({
+                  customer_name: "",
+                  customer_email: "",
+                  customer_phone: "",
+                  notes: "",
+                });
+              }
+            }}
             className="bg-amber-300 text-slate-900 px-4 py-2.5 rounded-lg font-semibold hover:bg-amber-400 transition"
           >
             {showNewOrderForm ? "Cancelar" : "+ Nuevo Pedido"}
           </button>
         </div>
 
-        {/* Error Message */}
+        {/* Estadísticas */}
+        <div className="grid gap-4 md:grid-cols-3">
+          <div className="rounded-xl border border-blue-500/30 bg-blue-500/10 p-4">
+            <p className="text-xs font-medium text-blue-200">Total Pedidos</p>
+            <p className="mt-2 text-2xl font-bold text-blue-300">
+              {totalOrders}
+            </p>
+          </div>
+          <div className="rounded-xl border border-yellow-500/30 bg-yellow-500/10 p-4">
+            <p className="text-xs font-medium text-yellow-200">Pendientes</p>
+            <p className="mt-2 text-2xl font-bold text-yellow-300">
+              {pendingOrders.length}
+            </p>
+          </div>
+          <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4">
+            <p className="text-xs font-medium text-emerald-200">Clientes</p>
+            <p className="mt-2 text-2xl font-bold text-emerald-300">
+              {customers.length}
+            </p>
+          </div>
+        </div>
+
+        {/* Mensajes */}
         {error && (
           <div className="bg-red-900/30 border border-red-600 text-red-300 px-4 py-3 rounded">
             {error}
           </div>
         )}
-
-        {/* Success Message */}
         {successMessage && (
           <div className="bg-emerald-900/30 border border-emerald-600 text-emerald-300 px-4 py-3 rounded">
             {successMessage}
           </div>
         )}
 
-        {/* New Order Form */}
+        {/* Formulario */}
         {showNewOrderForm && (
           <div className="bg-slate-800 p-6 rounded-lg border border-slate-700">
             <h2 className="text-lg font-semibold text-amber-300 mb-4">
               Crear Nuevo Pedido
             </h2>
-            <form
-              onSubmit={handleCreateOrder}
-              className="grid grid-cols-1 md:grid-cols-2 gap-4"
-            >
-              <div>
+            <form onSubmit={handleCreateOrder} className="space-y-4">
+              {/* Búsqueda de Cliente */}
+              <div className="relative">
                 <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Nombre del Cliente *
+                  Seleccionar Cliente (Escribe para buscar)
                 </label>
-                <input
-                  type="text"
-                  value={newOrderData.customer_name}
-                  onChange={(e) =>
-                    setNewOrderData({
-                      ...newOrderData,
-                      customer_name: e.target.value,
-                    })
-                  }
-                  placeholder="Nombre..."
-                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={customerSearch}
+                    onChange={(e) => setCustomerSearch(e.target.value)}
+                    placeholder="Busca por nombre de cliente..."
+                    className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                  />
+                  {selectedCustomer && (
+                    <div className="mt-2 p-3 bg-slate-700 rounded border border-emerald-500/50">
+                      <p className="text-sm text-emerald-300 font-semibold">
+                        ✓ {selectedCustomer.name}
+                      </p>
+                      {selectedCustomer.email && (
+                        <p className="text-xs text-slate-400">
+                          {selectedCustomer.email}
+                        </p>
+                      )}
+                      {selectedCustomer.phone && (
+                        <p className="text-xs text-slate-400">
+                          {selectedCustomer.phone}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                  {showCustomerDropdown && filteredCustomers.length > 0 && (
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-slate-700 border border-slate-600 rounded shadow-lg z-10 max-h-40 overflow-y-auto">
+                      {filteredCustomers.map((customer) => (
+                        <button
+                          key={customer.id}
+                          type="button"
+                          onClick={() => handleSelectCustomer(customer)}
+                          className="w-full text-left px-3 py-2 hover:bg-slate-600 text-white text-sm border-b border-slate-600 last:border-b-0"
+                        >
+                          <p className="font-medium">{customer.name}</p>
+                          {customer.email && (
+                            <p className="text-xs text-slate-400">
+                              {customer.email}
+                            </p>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={newOrderData.customer_email || ""}
-                  onChange={(e) =>
-                    setNewOrderData({
-                      ...newOrderData,
-                      customer_email: e.target.value,
-                    })
-                  }
-                  placeholder="Email..."
-                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
-                />
+              {/* Datos de Cliente */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    Nombre del Cliente *
+                  </label>
+                  <input
+                    type="text"
+                    value={newOrderData.customer_name}
+                    onChange={(e) =>
+                      setNewOrderData({
+                        ...newOrderData,
+                        customer_name: e.target.value,
+                      })
+                    }
+                    placeholder="Nombre..."
+                    className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    value={newOrderData.customer_email || ""}
+                    onChange={(e) =>
+                      setNewOrderData({
+                        ...newOrderData,
+                        customer_email: e.target.value,
+                      })
+                    }
+                    placeholder="Email..."
+                    className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    Teléfono
+                  </label>
+                  <input
+                    type="tel"
+                    value={newOrderData.customer_phone || ""}
+                    onChange={(e) =>
+                      setNewOrderData({
+                        ...newOrderData,
+                        customer_phone: e.target.value,
+                      })
+                    }
+                    placeholder="Teléfono..."
+                    className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    Notas
+                  </label>
+                  <input
+                    type="text"
+                    value={newOrderData.notes || ""}
+                    onChange={(e) =>
+                      setNewOrderData({
+                        ...newOrderData,
+                        notes: e.target.value,
+                      })
+                    }
+                    placeholder="Notas opcionales..."
+                    className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Teléfono
-                </label>
-                <input
-                  type="tel"
-                  value={newOrderData.customer_phone || ""}
-                  onChange={(e) =>
-                    setNewOrderData({
-                      ...newOrderData,
-                      customer_phone: e.target.value,
-                    })
-                  }
-                  placeholder="Teléfono..."
-                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Notas
-                </label>
-                <input
-                  type="text"
-                  value={newOrderData.notes || ""}
-                  onChange={(e) =>
-                    setNewOrderData({
-                      ...newOrderData,
-                      notes: e.target.value,
-                    })
-                  }
-                  placeholder="Notas opcionales..."
-                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
-                />
-              </div>
-
-              <div className="md:col-span-2 flex gap-2">
+              <div className="md:col-span-2 flex gap-2 pt-4">
                 <button
                   type="submit"
                   className="flex-1 bg-emerald-600 text-white px-4 py-2.5 rounded font-semibold hover:bg-emerald-700 transition"

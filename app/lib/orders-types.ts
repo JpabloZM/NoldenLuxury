@@ -30,6 +30,7 @@ export type OrderStatus =
 export interface Order {
   id: string;
   order_number: string;
+  customer_id?: string;
   customer_name: string;
   customer_email?: string;
   customer_phone?: string;
@@ -41,6 +42,7 @@ export interface Order {
 }
 
 export interface OrderForm {
+  customer_id?: string;
   customer_name: string;
   customer_email?: string;
   customer_phone?: string;
