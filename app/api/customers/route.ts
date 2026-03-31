@@ -1,19 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-let supabase: any;
-try {
-  supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  );
-} catch (err) {
-  console.error("Failed to create Supabase client:", err);
-}
+import { supabaseServer } from "@/app/lib/supabase";
 
 // GET - Obtener todos los clientes o buscar
 export async function GET(request: NextRequest) {
   try {
+    const supabase = supabaseServer();
     const { searchParams } = new URL(request.url);
     const search = searchParams.get("search");
 
@@ -31,13 +22,14 @@ export async function GET(request: NextRequest) {
     const { data, error } = await query;
 
     if (error) {
-      console.error("Error fetching customers:", error);
+      console.error("❌ Error fetching customers:", error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    console.log("✅ Customers fetched:", data?.length || 0);
     return NextResponse.json(data || []);
   } catch (error) {
-    console.error("Error in GET /api/customers:", error);
+    console.error("❌ Error in GET /api/customers:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },
@@ -48,6 +40,7 @@ export async function GET(request: NextRequest) {
 // POST - Crear nuevo cliente
 export async function POST(request: NextRequest) {
   try {
+    const supabase = supabaseServer();
     const body = await request.json();
     const {
       name,
@@ -85,13 +78,14 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error("Error creating customer:", error);
+      console.error("❌ Error creating customer:", error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    console.log("✅ Customer created:", data.name);
     return NextResponse.json(data);
   } catch (error) {
-    console.error("Error in POST /api/customers:", error);
+    console.error("❌ Error in POST /api/customers:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

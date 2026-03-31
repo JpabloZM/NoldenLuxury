@@ -114,19 +114,29 @@ export default function RegisterPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 to-slate-900 flex items-center justify-center px-6 py-12">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-2xl">
         <div className="rounded-2xl border border-white/10 bg-slate-900/80 p-8 backdrop-blur">
           <div className="mb-8 text-center">
-            <h1 className="text-3xl font-bold text-white">ARNOLUX</h1>
-            <p className="mt-2 text-sm text-amber-200">Crea tu cuenta</p>
+            <h1
+              className="text-3xl font-black tracking-wider bg-gradient-to-r from-amber-200 via-yellow-300 to-amber-300 bg-clip-text text-transparent drop-shadow-lg"
+              style={{
+                textShadow: "0 10px 25px rgba(217, 119, 6, 0.3)",
+                filter: "drop-shadow(0 0 20px rgba(217, 119, 6, 0.2))",
+              }}
+            >
+              NOLDEN LUXURY
+            </h1>
+            <p className="mt-4 text-sm text-amber-200/90 font-light tracking-widest">
+              Crea tu cuenta
+            </p>
           </div>
 
           <form
             onSubmit={handleSubmit}
-            className="space-y-4"
+            className="grid grid-cols-2 gap-4"
             autoComplete="off"
           >
-            <div>
+            <div className="col-span-2">
               <label className="block text-sm font-medium text-slate-300 mb-2">
                 Nombre Completo
               </label>
@@ -140,7 +150,7 @@ export default function RegisterPage() {
               />
             </div>
 
-            <div>
+            <div className="col-span-2">
               <label className="block text-sm font-medium text-slate-300 mb-2">
                 Email
               </label>
@@ -216,7 +226,7 @@ export default function RegisterPage() {
               />
             </div>
 
-            <div>
+            <div className="col-span-2">
               <label className="block text-sm font-medium text-slate-300 mb-2">
                 Dirección de Entrega
               </label>
@@ -261,7 +271,7 @@ export default function RegisterPage() {
             </div>
 
             {error && (
-              <div className="rounded-lg bg-red-500/10 border border-red-500/30 p-3">
+              <div className="col-span-2 rounded-lg bg-red-500/10 border border-red-500/30 p-3">
                 <p className="text-sm text-red-200">{error}</p>
               </div>
             )}
@@ -269,7 +279,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-lg bg-amber-300 px-4 py-2.5 font-semibold text-slate-900 transition hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-amber-300/50 disabled:opacity-50"
+              className="col-span-2 rounded-lg bg-amber-300 px-4 py-2.5 font-semibold text-slate-900 transition hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-amber-300/50 disabled:opacity-50"
             >
               {loading ? "Registrando..." : "Registrarse"}
             </button>

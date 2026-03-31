@@ -1,22 +1,25 @@
-import { supabase } from "@/app/lib/supabase";
+import { supabaseServer } from "@/app/lib/supabase";
 import { NextRequest, NextResponse } from "next/server";
 
 // GET - Obtener todos los materiales
 export async function GET() {
   try {
+    const supabase = supabaseServer();
+
     const { data, error } = await supabase
       .from("materials")
       .select("*")
       .order("name", { ascending: true });
 
     if (error) {
-      console.error("Supabase error:", error);
+      console.error("❌ Error fetching materials:", error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    console.log("✅ Materials fetched:", data?.length || 0);
     return NextResponse.json(data || []);
   } catch (err) {
-    console.error("Error fetching materials:", err);
+    console.error("❌ Error fetching materials:", err);
     return NextResponse.json(
       { error: "Failed to fetch materials" },
       { status: 500 },
@@ -27,6 +30,7 @@ export async function GET() {
 // POST - Crear nuevo material
 export async function POST(request: NextRequest) {
   try {
+    const supabase = supabaseServer();
     const body = await request.json();
     console.log("POST /api/materials - Request body:", body);
     const { name, quantity, unit, min_quantity, cost_per_unit, supplier } =

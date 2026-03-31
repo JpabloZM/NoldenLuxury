@@ -1,15 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-let supabase: any;
-try {
-  supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  );
-} catch (err) {
-  console.error("Failed to create Supabase client:", err);
-}
+import { supabaseServer } from "@/app/lib/supabase";
 
 // POST - Agregar item a orden
 export async function POST(
@@ -17,6 +7,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const supabase = supabaseServer();
     const { id: orderId } = await params;
     const body = await request.json();
     const { product_id, quantity, unit_price } = body;

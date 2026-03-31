@@ -1,15 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-let supabase: any;
-try {
-  supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  );
-} catch (err) {
-  console.error("Failed to create Supabase client:", err);
-}
+import { supabaseServer } from "@/app/lib/supabase";
 
 // GET - Obtener orden con items y movimientos
 export async function GET(
@@ -17,6 +7,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const supabase = supabaseServer();
     const { id: orderId } = await params;
 
     const { data: orderData, error: orderError } = await supabase
@@ -26,7 +17,7 @@ export async function GET(
       .single();
 
     if (orderError) {
-      console.error("Error fetching order:", orderError);
+      console.error("❌ Error fetching order:", orderError);
       return NextResponse.json({ error: orderError.message }, { status: 500 });
     }
 
@@ -48,7 +39,7 @@ export async function GET(
       .eq("order_id", orderId);
 
     if (itemsError) {
-      console.error("Error fetching order items:", itemsError);
+      console.error("❌ Error fetching order items:", itemsError);
       return NextResponse.json({ error: itemsError.message }, { status: 500 });
     }
 
@@ -59,7 +50,7 @@ export async function GET(
       .order("created_at", { ascending: false });
 
     if (movementsError) {
-      console.error("Error fetching order movements:", movementsError);
+      console.error("❌ Error fetching order movements:", movementsError);
       return NextResponse.json(
         { error: movementsError.message },
         { status: 500 },
@@ -78,6 +69,7 @@ export async function GET(
       updated_at: item.updated_at,
     }));
 
+    console.log("✅ Order fetched with", items.length, "items");
     return NextResponse.json({
       ...orderData,
       items,
@@ -85,7 +77,7 @@ export async function GET(
       item_count: items.length,
     });
   } catch (error) {
-    console.error("Error in GET /api/orders/[id]:", error);
+    console.error("❌ Error in GET /api/orders/[id]:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },
@@ -99,6 +91,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const supabase = supabaseServer();
     const { id: orderId } = await params;
     const body = await request.json();
     const { status, confirm = false } = body;

@@ -18,7 +18,9 @@ export default function LoginPage() {
 
     try {
       const clientes = JSON.parse(localStorage.getItem("clientes") || "[]");
-      const cliente = clientes.find((c: any) => c.email === email && c.password === password);
+      const cliente = clientes.find(
+        (c: any) => c.email === email && c.password === password,
+      );
 
       if (!cliente) {
         setError("Email o contraseña incorrectos");
@@ -41,8 +43,18 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="rounded-2xl border border-white/10 bg-slate-900/80 p-8 backdrop-blur">
           <div className="mb-8 text-center">
-            <h1 className="text-3xl font-bold text-white">ARNOLUX</h1>
-            <p className="mt-2 text-sm text-amber-200">Inicia sesión en tu cuenta</p>
+            <h1
+              className="text-3xl font-black tracking-wider bg-gradient-to-r from-amber-200 via-yellow-300 to-amber-300 bg-clip-text text-transparent drop-shadow-lg"
+              style={{
+                textShadow: "0 10px 25px rgba(217, 119, 6, 0.3)",
+                filter: "drop-shadow(0 0 20px rgba(217, 119, 6, 0.2))",
+              }}
+            >
+              NOLDEN LUXURY
+            </h1>
+            <p className="mt-4 text-sm text-amber-200/90 font-light tracking-widest">
+              Inicia sesión en tu cuenta
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -89,12 +101,18 @@ export default function LoginPage() {
 
           <p className="mt-6 text-center text-sm text-slate-400">
             ¿No tienes cuenta?{" "}
-            <Link href="/auth/register" className="text-amber-300 hover:text-amber-200">
+            <Link
+              href="/auth/register"
+              className="text-amber-300 hover:text-amber-200"
+            >
               Regístrate aquí
             </Link>
           </p>
 
-          <Link href="/" className="mt-4 block text-center text-xs text-slate-500 hover:text-slate-400">
+          <Link
+            href="/"
+            className="mt-4 block text-center text-xs text-slate-500 hover:text-slate-400"
+          >
             Volver a inicio
           </Link>
         </div>

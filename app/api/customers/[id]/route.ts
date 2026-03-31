@@ -1,15 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-let supabase: any;
-try {
-  supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  );
-} catch (err) {
-  console.error("Failed to create Supabase client:", err);
-}
+import { supabaseServer } from "@/app/lib/supabase";
 
 // GET - Obtener cliente por ID
 export async function GET(
@@ -17,6 +7,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const supabase = supabaseServer();
     const { id } = await params;
 
     const { data, error } = await supabase
@@ -49,6 +40,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const supabase = supabaseServer();
     const { id } = await params;
     const body = await request.json();
     const { name, email, phone, address, city, state, zip_code, notes } = body;
@@ -104,6 +96,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const supabase = supabaseServer();
     const { id } = await params;
 
     // Verificar si el cliente tiene órdenes

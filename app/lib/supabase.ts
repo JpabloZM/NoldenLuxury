@@ -23,3 +23,19 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 export const supabase = createClient(supabaseUrl || "", supabaseAnonKey || "");
+
+// Cliente para operaciones del servidor (API routes)
+// 🔒 IMPORTANTE: El SERVICE_ROLE_KEY solo se usa en el servidor, NUNCA en el cliente
+export const supabaseServer = () => {
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!serviceRoleKey) {
+    throw new Error(
+      "❌ SUPABASE_SERVICE_ROLE_KEY no está configurada en .env.local\n" +
+        "Ve a Supabase Dashboard → Settings → API → Service Role Secret\n" +
+        "y agrégala a tu .env.local",
+    );
+  }
+
+  return createClient(supabaseUrl || "", serviceRoleKey);
+};

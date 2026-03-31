@@ -1,15 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-let supabase: any;
-try {
-  supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  );
-} catch (err) {
-  console.error("Failed to create Supabase client:", err);
-}
+import { supabaseServer } from "@/app/lib/supabase";
 
 // Helper para generar número de orden
 function generateOrderNumber(): string {
@@ -26,19 +16,22 @@ function generateOrderNumber(): string {
 // GET - Obtener todas las órdenes
 export async function GET(request: NextRequest) {
   try {
+    const supabase = supabaseServer();
+
     const { data, error } = await supabase
       .from("orders")
       .select("*")
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.error("Error fetching orders:", error);
+      console.error("❌ Error fetching orders:", error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    console.log("✅ Orders fetched:", data?.length || 0);
     return NextResponse.json(data || []);
   } catch (error) {
-    console.error("Error in GET /api/orders:", error);
+    console.error("❌ Error in GET /api/orders:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },
@@ -49,6 +42,7 @@ export async function GET(request: NextRequest) {
 // POST - Crear nueva orden
 export async function POST(request: NextRequest) {
   try {
+    const supabase = supabaseServer();
     const body = await request.json();
     const {
       customer_id,
@@ -83,7 +77,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error("Error creating order:", error);
+      console.error("❌ Error creating order:", error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
@@ -94,9 +88,10 @@ export async function POST(request: NextRequest) {
       reason: "Orden creada",
     });
 
+    console.log("✅ Order created:", data.order_number);
     return NextResponse.json(data);
   } catch (error) {
-    console.error("Error in POST /api/orders:", error);
+    console.error("❌ Error in POST /api/orders:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

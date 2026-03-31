@@ -51,13 +51,21 @@ CREATE INDEX idx_products_inventory ON products(inventory);
 
 ## 4. Configurar Row Level Security (RLS)
 
-Seguridad: Controla quién puede ver/editar productos
+⚠️ **IMPORTANTE**: RLS debe estar **HABILITADO** en producción.
 
-1. Ve a la tabla `products`
-2. En **Authentication → Policies**
-3. Desactiva RLS para desarrollo:
+Para desarrollo local, puedes deshabilitarlo temporalmente SOLO si:
 
-   Click en **Disable RLS** (o configura policies después)
+- No tienes datos sensibles
+- Tu BD no está expuesta a internet
+- No la usas en una API pública
+
+**RECOMENDACIÓN**: Ve a `SECURITY_RLS_SETUP.md` para hacer esto correctamente desde el inicio.
+
+Para habilitar RLS de forma robusta:
+
+1. Ejecuta el SQL en `SECURITY_RLS_SETUP.md`
+2. Verifica que las políticas estén creadas
+3. Prueba acceso desde `Supabase SQL Editor`
 
 ## 5. Insertar Productos Iniciales (Opcional)
 

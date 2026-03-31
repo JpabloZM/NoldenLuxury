@@ -1,21 +1,12 @@
-import { createClient } from "@supabase/supabase-js";
+import { supabaseServer } from "@/app/lib/supabase";
 import { NextResponse } from "next/server";
-
-let supabase: any;
-try {
-  supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  );
-} catch (err) {
-  console.error("Failed to create Supabase client:", err);
-}
 
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const supabase = supabaseServer();
     const { id } = await params;
 
     if (!id) {
@@ -35,9 +26,10 @@ export async function GET(
       return NextResponse.json({ error: error.message }, { status: 404 });
     }
 
+    console.log("✅ Product fetched:", data.name);
     return NextResponse.json(data);
   } catch (err) {
-    console.error("API error:", err);
+    console.error("❌ API error:", err);
     return NextResponse.json(
       { error: "Failed to fetch product" },
       { status: 500 },
@@ -50,6 +42,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const supabase = supabaseServer();
     const { id } = await params;
 
     if (!id) {
@@ -255,6 +248,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const supabase = supabaseServer();
     const { id } = await params;
 
     console.log("Deleting product with ID:", id);
@@ -273,6 +267,7 @@ export async function DELETE(
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    console.log("✅ Product deleted successfully");
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("API error:", err);

@@ -1,20 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-let supabase: any;
-try {
-  supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  );
-  console.log("Supabase client created for product-recipes");
-} catch (err) {
-  console.error("Failed to create Supabase client:", err);
-}
+import { supabaseServer } from "@/app/lib/supabase";
 
 // POST - Crear una receta de producto (vincular material con cantidad)
 export async function POST(request: NextRequest) {
   try {
+    const supabase = supabaseServer();
     console.log("POST /api/product-recipes/create - Creating product recipe");
 
     const body = await request.json();
