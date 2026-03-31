@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Toast } from "./Toast";
+import Toast from "./Toast";
 
 export default function ContactForm() {
   const [formData, setFormData] = useState({
@@ -16,7 +16,7 @@ export default function ContactForm() {
   } | null>(null);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -43,7 +43,8 @@ export default function ContactForm() {
       if (response.ok) {
         setToast({
           type: "success",
-          message: "¡Mensaje enviado correctamente! Nos pondremos en contacto pronto.",
+          message:
+            "¡Mensaje enviado correctamente! Nos pondremos en contacto pronto.",
         });
         // Limpiar formulario
         setFormData({
@@ -69,7 +70,10 @@ export default function ContactForm() {
 
   return (
     <>
-      <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-white/10 bg-slate-950 p-6">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-4 rounded-2xl border border-white/10 bg-slate-950 p-6"
+      >
         <input
           type="text"
           name="nombre"

@@ -52,7 +52,10 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="beneficios" className="mx-auto w-full max-w-6xl px-6 py-16 scroll-mt-24">
+      <section
+        id="beneficios"
+        className="mx-auto w-full max-w-6xl px-6 py-16 scroll-mt-24"
+      >
         <h2 className="text-3xl font-semibold text-white">
           Beneficios para tu compra
         </h2>

@@ -11,6 +11,15 @@ interface ContactForm {
 
 export async function POST(request: NextRequest) {
   try {
+    // Validar que RESEND_API_KEY existe
+    if (!process.env.RESEND_API_KEY) {
+      console.error("RESEND_API_KEY no está configurado");
+      return NextResponse.json(
+        { error: "Error de configuración del servidor" },
+        { status: 500 },
+      );
+    }
+
     const body = (await request.json()) as ContactForm;
     const { nombre, email, mensaje } = body;
 
@@ -18,13 +27,15 @@ export async function POST(request: NextRequest) {
     if (!nombre || !email || !mensaje) {
       return NextResponse.json(
         { error: "Faltan campos requeridos" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
+    console.log("Enviando email de contacto:", { nombre, email });
+
     // Enviar email a noldenluxury@gmail.com
     const response = await resend.emails.send({
-      from: "contacto@noldenluxury.com",
+      from: "onboarding@resend.dev",
       to: "noldenluxury@gmail.com",
       replyTo: email,
       subject: `Nuevo usuario de contacto: ${nombre}`,
@@ -62,15 +73,18 @@ ${mensaje}
     });
 
     if (response.error) {
+      console.error("Error de Resend al enviar email:", response.error);
       return NextResponse.json(
         { error: "Error al enviar el email" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
+    console.log("Email enviado correctamente a noldenluxury@gmail.com");
+
     // Enviar email de confirmación al cliente
-    await resend.emails.send({
-      from: "contacto@noldenluxury.com",
+    const confirmResponse = await resend.emails.send({
+      from: "onboarding@resend.dev",
       to: email,
       subject: "Hemos recibido tu mensaje - Nolden Luxury",
       html: `
@@ -115,6 +129,16 @@ ${mensaje}
       `,
     });
 
+    if (confirmResponse.error) {
+      console.error(
+        "Error de Resend al enviar confirmación:",
+        confirmResponse.error,
+      );
+      // No retornar error aquí, el email principal se envió correctamente
+    } else {
+      console.log("Email de confirmación enviado a:", email);
+    }
+
     return NextResponse.json({
       success: true,
       message: "Mensaje enviado correctamente",
@@ -123,7 +147,7 @@ ${mensaje}
     console.error("Error en API de contacto:", error);
     return NextResponse.json(
       { error: "Error interno del servidor" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
