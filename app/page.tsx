@@ -1,6 +1,8 @@
 import Header from "./components/Header";
 import Hero from "./components/Hero";
 import Catalog from "./components/Catalog";
+import ContactForm from "./components/ContactForm";
+import SocialLinks from "./components/SocialLinks";
 import Footer from "./components/Footer";
 
 export default function Home() {
@@ -10,7 +12,7 @@ export default function Home() {
       <Hero />
       <Catalog />
 
-      <section id="materiales" className="bg-slate-900/60 py-16">
+      <section id="materiales" className="bg-slate-900/60 py-16 scroll-mt-24">
         <div className="mx-auto w-full max-w-6xl px-6">
           <h2 className="text-3xl font-semibold text-white">
             Materiales principales
@@ -50,7 +52,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="beneficios" className="mx-auto w-full max-w-6xl px-6 py-16">
+      <section id="beneficios" className="mx-auto w-full max-w-6xl px-6 py-16 scroll-mt-24">
         <h2 className="text-3xl font-semibold text-white">
           Beneficios para tu compra
         </h2>
@@ -76,7 +78,7 @@ export default function Home() {
 
       <section
         id="contacto"
-        className="border-t border-white/10 bg-slate-900 py-16"
+        className="border-t border-white/10 bg-slate-900 py-16 scroll-mt-24"
       >
         <div className="mx-auto grid w-full max-w-6xl gap-8 px-6 md:grid-cols-2">
           <div>
@@ -89,31 +91,10 @@ export default function Home() {
               Nolden Luxury · El brillo de un legado
             </p>
           </div>
-          <form className="space-y-4 rounded-2xl border border-white/10 bg-slate-950 p-6">
-            <input
-              type="text"
-              placeholder="Nombre"
-              className="w-full rounded-lg border border-white/10 bg-slate-900 px-4 py-3 text-sm outline-none ring-amber-300/40 placeholder:text-slate-500 focus:ring"
-            />
-            <input
-              type="email"
-              placeholder="Email"
-              className="w-full rounded-lg border border-white/10 bg-slate-900 px-4 py-3 text-sm outline-none ring-amber-300/40 placeholder:text-slate-500 focus:ring"
-            />
-            <textarea
-              placeholder="¿Qué piezas buscas? (aretes, cadenas, anillos, etc.)"
-              rows={4}
-              className="w-full resize-none rounded-lg border border-white/10 bg-slate-900 px-4 py-3 text-sm outline-none ring-amber-300/40 placeholder:text-slate-500 focus:ring"
-            />
-            <button
-              type="button"
-              className="w-full rounded-xl bg-amber-300 px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-amber-200"
-            >
-              Solicitar catálogo
-            </button>
-          </form>
+          <ContactForm />
         </div>
       </section>
+      <SocialLinks />
       <Footer />
     </main>
   );

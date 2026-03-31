@@ -71,7 +71,7 @@ export default function Catalog() {
 
   if (loading) {
     return (
-      <section id="catalogo" className="mx-auto w-full max-w-6xl px-6 py-16">
+      <section id="catalogo" className="mx-auto w-full max-w-6xl px-6 py-16 scroll-mt-24">
         <div className="text-center">
           <p className="text-slate-400">Cargando catálogo...</p>
         </div>
@@ -80,7 +80,7 @@ export default function Catalog() {
   }
 
   return (
-    <section id="catalogo" className="mx-auto w-full max-w-6xl px-6 py-16">
+    <section id="catalogo" className="mx-auto w-full max-w-6xl px-6 py-16 scroll-mt-24">
       <div>
         <h2 className="text-3xl font-semibold text-white">Catálogo</h2>
         <p className="mt-3 max-w-2xl text-slate-300">
